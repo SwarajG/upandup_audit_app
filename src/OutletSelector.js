@@ -1,12 +1,23 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Button, Picker } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Picker,
+  AsyncStorage
+} from 'react-native';
 import request from './helper/request';
 
 type Props = {};
 export default class OutletSelector extends Component<Props> {
+  static navigationOptions = {
+    title: 'Select Outlet',
+  };
+
   state = {
     outlet: '',
-    outlets: []
+    outletsList: []
   };
 
   componentDidMount() {
@@ -22,15 +33,16 @@ export default class OutletSelector extends Component<Props> {
   }
 
   onPressEnter = () => {
-    const { outlet } = this.state;
-    alert(outlet);
+    const { navigate } = this.props.navigation;
+    const { outlet, outletsList } = this.state;
+    const selectedOutlet = outletsList.find(o => o._id === outlet);
+    AsyncStorage.setItem('outlet', JSON.stringify(selectedOutlet));
+    navigate('EntryOptions');
   }
 
-  updateOutletsList = (outlets) => {
-    this.setState({ outlets });
-  }
+  updateOutletsList = (outletsList) => this.setState({ outletsList, outlet: outletsList[0]._id })
 
-  renderItems = (outlets) => outlets.map(outlet => (
+  renderItems = outletsList => outletsList.map(outlet => (
     <Picker.Item
       key={outlet._id}
       label={outlet.name}
@@ -39,8 +51,8 @@ export default class OutletSelector extends Component<Props> {
   ))
 
   render() {
-    const { outlets, outlet } = this.state;
-    if (outlets.length === 0) {
+    const { outletsList, outlet } = this.state;
+    if (outletsList.length === 0) {
       return null;
     }
     return (
@@ -50,15 +62,14 @@ export default class OutletSelector extends Component<Props> {
           style={{ width: '60%' }}
           onValueChange={this.onValueChange}
         >
-          {this.renderItems(outlets)}
+          {this.renderItems(outletsList)}
         </Picker>
-        <Button
+        <TouchableOpacity
           onPress={this.onPressEnter}
-          title="Enter"
-          color="#841584"
           style={styles.button}
-          accessibilityLabel="Enter after selecting an outlet"
-        />
+        >
+          <Text style={styles.buttonText}>Enter</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -72,8 +83,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   button: {
-    height: 40,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 25,
+    paddingRight: 25,
+    borderRadius: 3,
     width: '40%',
     backgroundColor: '#2196F3',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFF'
   }
 });

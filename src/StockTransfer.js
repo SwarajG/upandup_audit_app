@@ -8,11 +8,7 @@ import {
 } from 'react-native';
 
 type Props = {};
-export default class EntryOptionSelector extends Component<Props> {
-  static navigationOptions = {
-    title: 'Select entry option',
-  };
-
+export default class StockTransfer extends Component<Props> {
   // async componentDidMount() {
   //   try {
   //     const outletObject = await AsyncStorage.getItem('outlet');
@@ -22,30 +18,10 @@ export default class EntryOptionSelector extends Component<Props> {
   //   }
   // }
 
-  onPressEditEntry = () => {
-    const { navigate } = this.props.navigation;
-    navigate('EntryTabs');
-  }
-
-  onPressView = () => {
-
-  }
-
   render() {
     return (
       <View style={styles.container}>
-        <TouchableOpacity
-          onPress={this.onPressEditEntry}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Stock & Purchase related entry/edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={this.onPressView}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Stock & Purchase view</Text>
-        </TouchableOpacity>
+        <Text>Hello World 3</Text>
       </View>
     );
   }
@@ -56,7 +32,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
   button: {
     paddingTop: 10,
