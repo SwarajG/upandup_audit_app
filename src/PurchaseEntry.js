@@ -6,13 +6,15 @@ import {
   ActivityIndicator,
   Text,
   TouchableOpacity,
-  ScrollView,
-  Picker
+  ScrollView
 } from 'react-native';
+import moment from 'moment';
 import { Table, Row } from 'react-native-table-component';
+import DateTimePicker from 'react-native-modal-datetime-picker';
 import AddPurchaseEntryModal from './AddPurchaseEntryModal';
 import request from './helper/request';
 
+const currentDate = new Date();
 
 type Props = {};
 export default class PurchaseEntry extends Component<Props> {
@@ -20,35 +22,46 @@ export default class PurchaseEntry extends Component<Props> {
     purchaseEntries: [],
     tableHead: ['Name', 'Unit', 'Quantity', 'Price'],
     widthArr: [160, 50, 80, 80],
-    itemList: [],
     isVisibleModal: false,
     outlet: {},
-    date: new Date().toISOString()
+    date: currentDate,
+    isDateTimePickerVisible: false
   };
 
   async componentDidMount() {
     try {
-      const outletObject = await AsyncStorage.getItem('outlet');
-      const itemListObject = await request.getAlltheItems();
-      const itemList = await itemListObject.json();
-
-      const outlet = JSON.parse(outletObject);
-      const currentDate = new Date().toISOString();
-      request.getAllpurchaseEntriesForOutlet(outlet._id, currentDate)
-        .then(response => response.json())
-        .then(response => this.updateData(itemList, outlet, response));
+      this.refetchList();
     } catch (error) {
       alert('Failed to fetch outlet object...');
     }
   }
 
-  updateData = (itemList, outlet, purchaseEntries) => this.setState({
-    itemList,
+  updateData = (outlet, purchaseEntries) => this.setState({
     outlet,
     purchaseEntries
   });
 
   updateModalVisibility = status => () => this.setState({ isVisibleModal: status });
+
+  _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+ 
+  _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+ 
+  _handleDatePicked = (date) => {
+    this.setState({ date }, this.refetchList);
+    this._hideDateTimePicker();
+  };
+
+  refetchList = async () => {
+    const { date } = this.state;
+    const outletObject = await AsyncStorage.getItem('outlet');
+
+      const outlet = JSON.parse(outletObject);
+      const selectedDate = moment(date).format('DD/MM/YYYY');
+      request.getAllpurchaseEntriesForOutlet(outlet._id, selectedDate)
+        .then(response => response.json())
+        .then(response => this.updateData(outlet, response));
+  }
 
   renderLoader = () => (
     <View style={[styles.container, styles.loaderWrapper]}>
@@ -69,6 +82,14 @@ export default class PurchaseEntry extends Component<Props> {
 
   renderTable = () => {
     const { purchaseEntries, tableHead, widthArr } = this.state;
+    if (purchaseEntries.length === 0) {
+      return (
+        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          {this.renderAddEntryButton()}
+          <Text>No Entries for this date...</Text>
+        </View>
+      )
+    }
     const tableData = purchaseEntries.map(entry => [
       entry.itemName, entry.unit, entry.quantity, entry.price
     ]);
@@ -107,16 +128,37 @@ export default class PurchaseEntry extends Component<Props> {
   }
 
   renderModal = () => {
-    const { isVisibleModal, itemList, outlet, date } = this.state;
+    const { isVisibleModal, outlet, date } = this.state;
     const outletId = outlet._id;
     return (
       <AddPurchaseEntryModal
         isVisibleModal={isVisibleModal}
-        itemList={itemList}
         updateModalVisibility={this.updateModalVisibility}
         outletId={outletId}
         date={date}
+        refetchList={this.refetchList}
       />
+    );
+  }
+
+  renderDatePicker = () => {
+    const { isDateTimePickerVisible, date } = this.state;
+    const currentDateInFormat = moment(date).format('DD/MM/YYYY');
+    return (
+      <View>
+        <View>
+          <Text>Date: {currentDateInFormat}</Text>
+          <TouchableOpacity onPress={this._showDateTimePicker}>
+            <Text>Choose date</Text>
+          </TouchableOpacity>
+        </View>
+        <DateTimePicker
+          isVisible={isDateTimePickerVisible}
+          onConfirm={this._handleDatePicked}
+          onCancel={this._hideDateTimePicker}
+          date={date}
+        />
+      </View>
     );
   }
 
@@ -124,6 +166,7 @@ export default class PurchaseEntry extends Component<Props> {
     return (
       <View style={styles.container}>
         {/* {this.renderLoader()} */}
+        {this.renderDatePicker()}
         {this.renderTable()}
         {this.renderModal()}
       </View>

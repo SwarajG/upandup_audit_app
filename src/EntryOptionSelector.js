@@ -13,22 +13,9 @@ export default class EntryOptionSelector extends Component<Props> {
     title: 'Select entry option',
   };
 
-  // async componentDidMount() {
-  //   try {
-  //     const outletObject = await AsyncStorage.getItem('outlet');
-  //     const outlet = JSON.parse(outletObject);
-  //   } catch (error) {
-  //     alert('Failed to fetch outlet object...');
-  //   }
-  // }
-
   onPressEditEntry = () => {
     const { navigate } = this.props.navigation;
     navigate('EntryTabs');
-  }
-
-  onPressView = () => {
-
   }
 
   render() {
@@ -39,12 +26,6 @@ export default class EntryOptionSelector extends Component<Props> {
           style={styles.button}
         >
           <Text style={styles.buttonText}>Stock & Purchase related entry/edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={this.onPressView}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Stock & Purchase view</Text>
         </TouchableOpacity>
       </View>
     );

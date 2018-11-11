@@ -12,7 +12,7 @@ const ThirdRoute = () => <StockTransfer />;
 type Props = {};
 export default class EntryTabs extends Component<Props> {
   state = {
-    index: 0,
+    index: 2,
     routes: [
       { key: 'first', title: 'Purchase' },
       { key: 'second', title: 'Stock Counting' },

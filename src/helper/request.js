@@ -21,9 +21,23 @@ export default {
     })
   }),
   getAlltheItems: () => fetch(`${baseUrl}/rowMaterials`),
+  getAlltheStockItems: () => fetch(`${baseUrl}/stockItems`),
   createPurchaseEntry: (purchaseData) => fetch(`${baseUrl}/purchaseEntries`, {
     method: 'POST',
     headers,
     body: JSON.stringify(purchaseData)
-  })
+  }),
+  createStockItemEntry: (stockItemData) => fetch(`${baseUrl}/inventoryCouting`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(stockItemData)
+  }),
+  getAllstockCountingsForOutlet: (outletId, date) => fetch(`${baseUrl}/inventoryCouting/on-date`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      outletId,
+      date
+    })
+  }),
 };

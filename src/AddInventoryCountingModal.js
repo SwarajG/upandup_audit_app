@@ -15,10 +15,9 @@ import request from './helper/request';
 type Props = {
   isVisibleModal: Boolean
 };
-export default class AddPurchaseEntryModal extends Component<Props> {
+export default class AddInventoryCountingModal extends Component<Props> {
   state = {
     quantity: 0,
-    price: 0,
     item: '',
     unit: enums.UNITS.KG,
     itemList: []
@@ -26,7 +25,7 @@ export default class AddPurchaseEntryModal extends Component<Props> {
 
   async componentDidMount() {
     try {
-      const itemListObject = await request.getAlltheItems();
+      const itemListObject = await request.getAlltheStockItems();
       const itemList = await itemListObject.json();
       const item = itemList[0]._id;
       this.updateData(itemList, item);
@@ -37,28 +36,27 @@ export default class AddPurchaseEntryModal extends Component<Props> {
 
   updateData = (itemList, item) => this.setState({ itemList, item });
 
-  createPurchaseEntry = async () => {
+  createStockItemEntry = async () => {
     const { updateModalVisibility, outletId, date, refetchList } = this.props;
-    const { item, unit, quantity, price, itemList } = this.state;
+    const { item, unit, quantity, itemList } = this.state;
     const selectedItemObject = itemList.find(i => i._id === item);
     const { _id, name } = selectedItemObject;
     try {
-      const purchaseEntry = {
+      const stockItemEntry = {
         outletId,
         itemId: _id,
         itemName: name,
         unit,
         quantity,
-        price,
         entryDate: moment(date).format('DD/MM/YYYY')
       };
-      const responseObject = await request.createPurchaseEntry(purchaseEntry);
+      const responseObject = await request.createStockItemEntry(stockItemEntry);
       const response = await responseObject.json();
       refetchList();
       updateModalVisibility(false)();
       
     } catch (error) {
-      alert('Error while creating purchase entry...');
+      alert('Error while creating stock entry...');
     }
   }
 
@@ -126,16 +124,8 @@ export default class AddPurchaseEntryModal extends Component<Props> {
             onChangeText={this.onChangedNumberInput('quantity')}
             style={styles.input}
           />
-          <TextInput
-            autoCapitalize={'none'}
-            maxLength={10}
-            placeholder="price"
-            value={price}
-            onChangeText={this.onChangedNumberInput('price')}
-            style={styles.input}
-          />
           <TouchableOpacity
-            onPress={this.createPurchaseEntry}
+            onPress={this.createStockItemEntry}
             style={styles.button}
           >
             <Text style={styles.buttonText}>Submit</Text>
