@@ -15,20 +15,31 @@ import request from './helper/request';
 type Props = {
   isVisibleModal: Boolean
 };
-export default class AddInventoryCountingModal extends Component<Props> {
-  state = {
-    quantity: 0,
-    item: '',
-    unit: enums.UNITS.KG,
-    itemList: []
-  };
+export default class AddPurchaseEntryModal extends Component<Props> {
+  constructor(props) {
+    super(props);
+    const isEditing = props.editing;
+    const { editingData } = props;
+    const quantity = isEditing ? editingData.quantity : 0;
+    const item = isEditing ? editingData.item : '';
+    const price = isEditing ? editingData.price : 0;
+    const unit = isEditing ? editingData.unit : enums.UNITS.KG;
+    this.state = {
+      quantity,
+      price,
+      item,
+      unit,
+      itemList: []
+    };
+  }
 
   async componentDidMount() {
+    const { item } = this.state;
     try {
-      const itemListObject = await request.getAlltheStockItems();
+      const itemListObject = await request.getAlltheItems();
       const itemList = await itemListObject.json();
-      const item = itemList[0]._id;
-      this.updateData(itemList, item);
+      const newItem = item ? item : itemList[0]._id;
+      this.updateData(itemList, newItem);
     } catch (error) {
       alert('Failed to fetch outlet object...');
     }
@@ -36,27 +47,33 @@ export default class AddInventoryCountingModal extends Component<Props> {
 
   updateData = (itemList, item) => this.setState({ itemList, item });
 
-  createStockItemEntry = async () => {
-    const { updateModalVisibility, outletId, date, refetchList } = this.props;
-    const { item, unit, quantity, itemList } = this.state;
+  createPurchaseEntry = async () => {
+    const { updateModalVisibility, outletId, date, refetchList, editing } = this.props;
+    const { item, unit, quantity, price, itemList } = this.state;
     const selectedItemObject = itemList.find(i => i._id === item);
     const { _id, name } = selectedItemObject;
+    const isEditing = editing;
     try {
-      const stockItemEntry = {
+      const purchaseEntry = {
         outletId,
         itemId: _id,
         itemName: name,
         unit,
         quantity,
+        price,
         entryDate: moment(date).format('DD/MM/YYYY')
       };
-      const responseObject = await request.createStockItemEntry(stockItemEntry);
-      const response = await responseObject.json();
+      if (isEditing) {
+        const responseObject = await request.updatePurchaseEntry(_id, purchaseEntry);
+        const response = await responseObject.json();
+      } else {
+        const responseObject = await request.createPurchaseEntry(purchaseEntry);
+        const response = await responseObject.json();
+      }
       refetchList();
       updateModalVisibility(false)();
-      
     } catch (error) {
-      alert('Error while creating stock entry...');
+      alert('Error while creating purchase entry...');
     }
   }
 
@@ -105,11 +122,11 @@ export default class AddInventoryCountingModal extends Component<Props> {
   )
 
   render() {
-    const { isVisibleModal, updateModalVisibility } = this.props;
+    const { updateModalVisibility } = this.props;
     const { quantity, price, item, unit, itemList } = this.state;
     return (
       <Modal
-        isVisible={isVisibleModal}
+        isVisible={true}
         onBackdropPress={updateModalVisibility(false)}
         onBackButtonPress={updateModalVisibility(false)}
       >
@@ -124,8 +141,16 @@ export default class AddInventoryCountingModal extends Component<Props> {
             onChangeText={this.onChangedNumberInput('quantity')}
             style={styles.input}
           />
+          <TextInput
+            autoCapitalize={'none'}
+            maxLength={10}
+            placeholder="price"
+            value={price}
+            onChangeText={this.onChangedNumberInput('price')}
+            style={styles.input}
+          />
           <TouchableOpacity
-            onPress={this.createStockItemEntry}
+            onPress={this.createPurchaseEntry}
             style={styles.button}
           >
             <Text style={styles.buttonText}>Submit</Text>

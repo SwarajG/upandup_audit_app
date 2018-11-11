@@ -15,21 +15,29 @@ import request from './helper/request';
 type Props = {
   isVisibleModal: Boolean
 };
-export default class AddPurchaseEntryModal extends Component<Props> {
-  state = {
-    quantity: 0,
-    price: 0,
-    item: '',
-    unit: enums.UNITS.KG,
-    itemList: []
-  };
+export default class AddInventoryCountingModal extends Component<Props> {
+  constructor(props) {
+    super(props);
+    const isEditing = props.editing;
+    const { editingData } = props;
+    const quantity = isEditing ? editingData.quantity : 0;
+    const item = isEditing ? editingData.item : '';
+    const unit = isEditing ? editingData.unit : enums.UNITS.KG;
+    this.state = {
+      quantity,
+      item,
+      unit,
+      itemList: []
+    };
+  }
 
   async componentDidMount() {
+    const { item } = this.state;
     try {
-      const itemListObject = await request.getAlltheItems();
+      const itemListObject = await request.getAlltheStockItems();
       const itemList = await itemListObject.json();
-      const item = itemList[0]._id;
-      this.updateData(itemList, item);
+      const newItem = item ? item : itemList[0]._id;
+      this.updateData(itemList, newItem);
     } catch (error) {
       alert('Failed to fetch outlet object...');
     }
@@ -37,28 +45,32 @@ export default class AddPurchaseEntryModal extends Component<Props> {
 
   updateData = (itemList, item) => this.setState({ itemList, item });
 
-  createPurchaseEntry = async () => {
-    const { updateModalVisibility, outletId, date, refetchList } = this.props;
-    const { item, unit, quantity, price, itemList } = this.state;
+  createStockItemEntry = async () => {
+    const { updateModalVisibility, outletId, date, refetchList, editing } = this.props;
+    const { item, unit, quantity, itemList } = this.state;
     const selectedItemObject = itemList.find(i => i._id === item);
     const { _id, name } = selectedItemObject;
+    const isEditing = editing;
     try {
-      const purchaseEntry = {
+      const stockItemEntry = {
         outletId,
         itemId: _id,
         itemName: name,
         unit,
         quantity,
-        price,
         entryDate: moment(date).format('DD/MM/YYYY')
       };
-      const responseObject = await request.createPurchaseEntry(purchaseEntry);
-      const response = await responseObject.json();
+      if (isEditing) {
+        const responseObject = await request.updateStockItemEntry(_id, stockItemEntry);
+        const response = await responseObject.json();
+      } else {
+        const responseObject = await request.createStockItemEntry(stockItemEntry);
+        const response = await responseObject.json();
+      }
       refetchList();
       updateModalVisibility(false)();
-      
     } catch (error) {
-      alert('Error while creating purchase entry...');
+      alert('Error while creating stock entry...');
     }
   }
 
@@ -88,7 +100,7 @@ export default class AddPurchaseEntryModal extends Component<Props> {
     return unitsList;
   }
 
-  renderRowMaterials = (itemList, item) => (
+  renderStockMaterials = (itemList, item) => (
     <Picker
       selectedValue={item}
       onValueChange={this.onValueChange('item')}
@@ -107,35 +119,26 @@ export default class AddPurchaseEntryModal extends Component<Props> {
   )
 
   render() {
-    const { isVisibleModal, updateModalVisibility } = this.props;
-    const { quantity, price, item, unit, itemList } = this.state;
+    const { updateModalVisibility } = this.props;
+    const { quantity, item, unit, itemList } = this.state;
     return (
       <Modal
-        isVisible={isVisibleModal}
+        isVisible={true}
         onBackdropPress={updateModalVisibility(false)}
         onBackButtonPress={updateModalVisibility(false)}
       >
         <View style={styles.modalWrapper}>
-          {this.renderRowMaterials(itemList, item)}
+          {this.renderStockMaterials(itemList, item)}
           {this.renderUnit(unit)}
           <TextInput
-            autoCapitalize={'none'}
             maxLength={10}
             placeholder="quantity"
-            value={quantity}
+            defaultValue={quantity}
             onChangeText={this.onChangedNumberInput('quantity')}
             style={styles.input}
           />
-          <TextInput
-            autoCapitalize={'none'}
-            maxLength={10}
-            placeholder="price"
-            value={price}
-            onChangeText={this.onChangedNumberInput('price')}
-            style={styles.input}
-          />
           <TouchableOpacity
-            onPress={this.createPurchaseEntry}
+            onPress={this.createStockItemEntry}
             style={styles.button}
           >
             <Text style={styles.buttonText}>Submit</Text>
@@ -156,8 +159,8 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   input: {
-    width: '50%',
-    justifyContent: 'center'
+    // width: '50%',
+    // justifyContent: 'center'
   },
   button: {
     paddingTop: 10,

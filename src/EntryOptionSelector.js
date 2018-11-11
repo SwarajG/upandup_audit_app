@@ -25,7 +25,7 @@ export default class EntryOptionSelector extends Component<Props> {
           onPress={this.onPressEditEntry}
           style={styles.button}
         >
-          <Text style={styles.buttonText}>Stock & Purchase related entry/edit</Text>
+          <Text style={styles.buttonText}>Stock & Purchase related entry / edit</Text>
         </TouchableOpacity>
       </View>
     );

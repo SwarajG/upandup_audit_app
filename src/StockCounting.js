@@ -3,30 +3,29 @@ import {
   StyleSheet,
   View,
   AsyncStorage,
-  ActivityIndicator,
-  Text,
-  TouchableOpacity,
-  ScrollView
 } from 'react-native';
 import moment from 'moment';
-import { Table, Row } from 'react-native-table-component';
-import DateTimePicker from 'react-native-modal-datetime-picker';
-import AddInventoryCountingModal from './AddInventoryCountingModal';
+import AddEntryButton from './helper/component/AddEntryButton';
+import CustomTable from './helper/component/CustomTable';
+import DatePicker from './helper/component/DatePicker';
+import AddUpdateInventoryCountingModal from './AddUpdateInventoryCountingModal';
 import request from './helper/request';
 
 const currentDate = new Date();
+const tableHead = ['Name', 'Unit', 'Quantity', '', ''];
+const keys = ['itemName', 'unit', 'quantity'];
+const widthArr = [160, 50, 80, 80, 80];
 
 type Props = {};
 export default class StockCounting extends Component<Props> {
   state = {
     stockCounting: [],
-    tableHead: ['Name', 'Unit', 'Quantity'],
-    widthArr: [160, 50, 80],
     itemList: [],
     isVisibleModal: false,
     outlet: {},
     date: currentDate,
-    isDateTimePickerVisible: false
+    editing: false,
+    editingData: {}
   };
 
   async componentDidMount() {
@@ -45,14 +44,7 @@ export default class StockCounting extends Component<Props> {
 
   updateModalVisibility = status => () => this.setState({ isVisibleModal: status });
 
-  _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
- 
-  _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
- 
-  _handleDatePicked = (date) => {
-    this.setState({ date }, this.refetchList);
-    this._hideDateTimePicker();
-  };
+  updateDate = date => this.setState({ date });
 
   refetchList = async () => {
     const { date } = this.state;
@@ -61,119 +53,81 @@ export default class StockCounting extends Component<Props> {
       const itemList = await itemListObject.json();
 
       const outlet = JSON.parse(outletObject);
-      const selectedDate = moment(date).format('DD/MM/YYYY');
-      request.getAllstockCountingsForOutlet(outlet._id, selectedDate)
+      const stockCountingFilters = {
+        outletId: outlet._id,
+        date: moment(date).format('DD/MM/YYYY')
+      };
+      request.getAllstockCountingsForOutlet(stockCountingFilters)
         .then(response => response.json())
         .then(response => this.updateData(itemList, outlet, response));
   }
 
-  renderLoader = () => (
-    <View style={[styles.container, styles.loaderWrapper]}>
-      <ActivityIndicator size="small" color="#2196F3" />
-    </View>
+  editRow = (rowIndex) => {
+    const { stockCounting } = this.state;
+    const currentRowData = stockCounting[rowIndex];
+    const editingData = {
+      quantity: currentRowData.quantity,
+      item: currentRowData.itemId,
+      unit: currentRowData.unit,
+    };
+    this.setState({
+      isVisibleModal: true,
+      editing: true,
+      editingData
+    });
+  }
+
+  deleteRow = async (rowIndex) => {
+    const { stockCounting } = this.state;
+    const entryId = stockCounting[rowIndex]._id;
+    const responseObject = await request.deleteStockItemEntry(entryId);
+    const response = await responseObject.json();
+    this.refetchList();
+  }
+
+  renderAddEntryButton = () => (
+    <AddEntryButton
+      updateModalVisibility={this.updateModalVisibility}
+    />
   )
 
-  renderAddEntryButton = () => {
-    return (
-      <TouchableOpacity
-        onPress={this.updateModalVisibility(true)}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>Add Entry</Text>
-      </TouchableOpacity>
-    );
-  }
-
-  renderTable = () => {
-    const { stockCounting, tableHead, widthArr } = this.state;
-    if (stockCounting.length === 0) {
-      return (
-        <View style={{ flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
-          {this.renderAddEntryButton()}
-          <Text>No Entries for this date...</Text>
-        </View>
-      )
-    }
-    const tableData = stockCounting.map(entry => [
-      entry.itemName, entry.unit, entry.quantity, entry.price
-    ]);
-    return (
-      <View style={[styles.container, styles.containerWrapper]}>
-        {this.renderAddEntryButton()}
-        <ScrollView horizontal={true}>
-          <View>
-            <Table borderStyle={{ borderColor: '#C1C0B9' }}>
-              <Row
-                data={tableHead}
-                widthArr={widthArr}
-                style={styles.row}
-                textStyle={styles.text}
-              />
-            </Table>
-            <ScrollView style={styles.dataWrapper}>
-              <Table borderStyle={{ borderColor: '#C1C0B9' }}>
-                {
-                  tableData.map((rowData, index) => (
-                    <Row
-                      key={index}
-                      data={rowData}
-                      widthArr={widthArr}
-                      style={[styles.row, index%2 && { backgroundColor: '#F7F6E7' }]}
-                      textStyle={styles.text}
-                    />
-                  ))
-                }
-              </Table>
-            </ScrollView>
-          </View>
-        </ScrollView>
-      </View>
-    );
-  }
+  renderTable = () => (
+    <CustomTable
+      data={this.state.stockCounting}
+      keys={keys}
+      tableHead={tableHead}
+      widthArr={widthArr}
+      updateModalVisibility={this.updateModalVisibility}
+      editRow={this.editRow}
+      deleteRow={this.deleteRow}
+    />
+  )
 
   renderModal = () => {
-    const { isVisibleModal, itemList, outlet, date } = this.state;
+    const { itemList, outlet, date, editing, editingData } = this.state;
     const outletId = outlet._id;
     return (
-      <AddInventoryCountingModal
-        isVisibleModal={isVisibleModal}
+      <AddUpdateInventoryCountingModal
         itemList={itemList}
         updateModalVisibility={this.updateModalVisibility}
         outletId={outletId}
         date={date}
         refetchList={this.refetchList}
+        editing={editing}
+        editingData={editingData}
       />
     );
   }
 
-  renderDatePicker = () => {
-    const { isDateTimePickerVisible, date } = this.state;
-    const currentDateInFormat = moment(date).format('DD/MM/YYYY');
-    return (
-      <View>
-        <View>
-          <Text>Date: {currentDateInFormat}</Text>
-          <TouchableOpacity onPress={this._showDateTimePicker}>
-            <Text>Choose date</Text>
-          </TouchableOpacity>
-        </View>
-        <DateTimePicker
-          isVisible={isDateTimePickerVisible}
-          onConfirm={this._handleDatePicked}
-          onCancel={this._hideDateTimePicker}
-          date={date}
-        />
-      </View>
-    );
-  }
+  renderDatePicker = () => <DatePicker updateDate={this.updateDate} />;
 
   render() {
+    const { isVisibleModal } = this.state;
     return (
       <View style={styles.container}>
-        {/* {this.renderLoader()} */}
         {this.renderDatePicker()}
         {this.renderTable()}
-        {this.renderModal()}
+        {isVisibleModal && this.renderModal()}
       </View>
     );
   }
@@ -197,20 +151,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     padding: 10
-  },
-  button: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 25,
-    paddingRight: 25,
-    borderRadius: 3,
-    width: '80%',
-    backgroundColor: '#2196F3',
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: 40
-  },
-  buttonText: {
-    color: '#FFF'
   }
 });
