@@ -59,12 +59,16 @@ export default class AddPurchaseEntryModal extends Component<Props> {
         itemId: _id,
         itemName: name,
         unit,
-        quantity,
-        price,
+        quantity: parseInt(quantity, 10),
+        price: parseInt(price, 10),
         entryDate: moment(date).format('DD/MM/YYYY')
       };
       if (isEditing) {
-        const responseObject = await request.updatePurchaseEntry(_id, purchaseEntry);
+        const { editingData } = this.props;
+        const responseObject = await request.updatePurchaseEntry(editingData._id, {
+          ...purchaseEntry,
+          _id: editingData._id
+        });
         const response = await responseObject.json();
       } else {
         const responseObject = await request.createPurchaseEntry(purchaseEntry);
@@ -79,7 +83,9 @@ export default class AddPurchaseEntryModal extends Component<Props> {
 
   onValueChange = key => value => this.setState({ [key]: value });
 
-  onChangedNumberInput = key => text => this.setState({ [key]: text.replace(/[^0-9]/g, '') });
+  onChangedNumberQuantity = text => this.setState({ quantity: text.replace(/[^0-9]/g, '') });
+
+  onChangedNumberPrice = text => this.setState({ price: text.replace(/[^0-9]/g, '') });
 
   renderItems = itemList => itemList.map(item => (
     <Picker.Item
@@ -134,19 +140,15 @@ export default class AddPurchaseEntryModal extends Component<Props> {
           {this.renderRowMaterials(itemList, item)}
           {this.renderUnit(unit)}
           <TextInput
-            autoCapitalize={'none'}
-            maxLength={10}
             placeholder="quantity"
-            value={quantity}
-            onChangeText={this.onChangedNumberInput('quantity')}
+            value={quantity.toString()}
+            onChangeText={this.onChangedNumberQuantity}
             style={styles.input}
           />
           <TextInput
-            autoCapitalize={'none'}
-            maxLength={10}
             placeholder="price"
-            value={price}
-            onChangeText={this.onChangedNumberInput('price')}
+            value={price.toString()}
+            onChangeText={this.onChangedNumberPrice}
             style={styles.input}
           />
           <TouchableOpacity

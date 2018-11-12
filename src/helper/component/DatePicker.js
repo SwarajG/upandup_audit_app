@@ -27,6 +27,7 @@ export default class StockCounting extends Component<Props> {
 
   render() {
     const { date } = this.props;
+    console.log(date);
     const { isDateTimePickerVisible } = this.state;
     const currentDateInFormat = moment(date).format('DD/MM/YYYY');
     return (

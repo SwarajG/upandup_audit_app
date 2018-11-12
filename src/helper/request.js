@@ -22,7 +22,7 @@ const putMethodProps = {
 export default {
   // outlets
   getAllOutlets: () => fetch(`${baseUrl}/outlets`),
-  createOutlet: (outlet) => fetch(`${baseUrl}/outlets`, {
+  createOutlet: outlet => fetch(`${baseUrl}/outlets`, {
     ...postMethodProps,
     body: JSON.stringify(outlet)
   }),
@@ -38,7 +38,7 @@ export default {
     ...postMethodProps,
     body: JSON.stringify(purchaseEntryfilters)
   }),
-  createPurchaseEntry: (purchaseData) => fetch(`${baseUrl}/purchaseEntries`, {
+  createPurchaseEntry: purchaseData => fetch(`${baseUrl}/purchaseEntries`, {
     ...postMethodProps,
     body: JSON.stringify(purchaseData)
   }),
@@ -46,7 +46,7 @@ export default {
     ...putMethodProps,
     body: JSON.stringify(purchaseData)
   }),
-  deletePurchaseEntry: (id) => fetch(`${baseUrl}/purchaseEntries/${id}`, {
+  deletePurchaseEntry: id => fetch(`${baseUrl}/purchaseEntries/${id}`, {
     ...deleteMethodProps,
   }),
 
@@ -55,7 +55,7 @@ export default {
     ...postMethodProps,
     body: JSON.stringify(stockCountingFilters)
   }),
-  createStockItemEntry: (stockItemData) => fetch(`${baseUrl}/inventoryCouting`, {
+  createStockItemEntry: stockItemData => fetch(`${baseUrl}/inventoryCouting`, {
     ...postMethodProps,
     body: JSON.stringify(stockItemData)
   }),
@@ -63,7 +63,7 @@ export default {
     ...putMethodProps,
     body: JSON.stringify(stockItemData)
   }),
-  deleteStockItemEntry: (id) => fetch(`${baseUrl}/inventoryCouting/${id}`, {
+  deleteStockItemEntry: id => fetch(`${baseUrl}/inventoryCouting/${id}`, {
     ...deleteMethodProps,
   }),
 
@@ -80,7 +80,7 @@ export default {
     ...putMethodProps,
     body: JSON.stringify(stockTransferData)
   }),
-  deleteStockTransferEntry: (id) => fetch(`${baseUrl}/stockTransferEntries/${id}`, {
+  deleteStockTransferEntry: id => fetch(`${baseUrl}/stockTransferEntries/${id}`, {
     ...deleteMethodProps,
   }),
 };

@@ -57,9 +57,12 @@ export default class StockTransfer extends Component<Props> {
     });
   }
 
-  updateModalVisibility = status => () => this.setState({ isVisibleModal: status });
+  updateModalVisibility = status => () => {
+    const editing = !status;
+    this.setState({ isVisibleModal: status, editing });
+  }
 
-  updateDate = date => this.setState({ date });
+  updateDate = date => this.setState({ date }, this.refetchList);
 
   editRow = (rowIndex) => {
     const { stockTransfers } = this.state;
@@ -68,7 +71,8 @@ export default class StockTransfer extends Component<Props> {
       quantity: currentRowData.quantity,
       item: currentRowData.itemId,
       unit: currentRowData.unit,
-      outlet: currentRowData.toOutletId
+      outlet: currentRowData.toOutletId,
+      _id: currentRowData._id
     };
     this.setState({
       isVisibleModal: true,
@@ -141,7 +145,12 @@ export default class StockTransfer extends Component<Props> {
     );
   }
 
-  renderDatePicker = () => <DatePicker updateDate={this.updateDate} />;
+  renderDatePicker = () => (
+    <DatePicker
+      updateDate={this.updateDate}
+      date={this.state.date}
+    />
+  )
 
   render() {
     const { isVisibleModal } = this.state;

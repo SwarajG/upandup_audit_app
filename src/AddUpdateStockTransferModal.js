@@ -65,12 +65,15 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
         itemName: name,
         fromOutletId: outletId,
         toOutletId: outlet,
-        quantity,
+        quantity: parseInt(quantity, 10),
         unit,
         entryDate: moment(date).format('DD/MM/YYYY')
       };
       if (isEditing) {
-        const responseObject = await request.updateStockTransferEntry(_id, stockTransferEntry);
+        const { editingData } = this.props;
+        const responseObject = await request.updateStockTransferEntry(editingData._id, {  ...stockTransferEntry,
+          _id: editingData._id
+        });
         const response = await responseObject.json();
       } else {
         const responseObject = await request.createStockTransferEntry(stockTransferEntry);
@@ -161,7 +164,7 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
           <TextInput
             maxLength={10}
             placeholder="quantity"
-            value={quantity}
+            value={quantity.toString()}
             onChangeText={this.onChangedNumberInput('quantity')}
             style={styles.input}
           />

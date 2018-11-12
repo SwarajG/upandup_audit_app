@@ -57,11 +57,14 @@ export default class AddInventoryCountingModal extends Component<Props> {
         itemId: _id,
         itemName: name,
         unit,
-        quantity,
+        quantity: parseInt(quantity, 10),
         entryDate: moment(date).format('DD/MM/YYYY')
       };
       if (isEditing) {
-        const responseObject = await request.updateStockItemEntry(_id, stockItemEntry);
+        const { editingData } = this.props;
+        const responseObject = await request.updateStockItemEntry(editingData._id, { ...stockItemEntry,
+          _id: editingData._id
+        });
         const response = await responseObject.json();
       } else {
         const responseObject = await request.createStockItemEntry(stockItemEntry);
@@ -133,7 +136,7 @@ export default class AddInventoryCountingModal extends Component<Props> {
           <TextInput
             maxLength={10}
             placeholder="quantity"
-            defaultValue={quantity}
+            defaultValue={quantity.toString()}
             onChangeText={this.onChangedNumberInput('quantity')}
             style={styles.input}
           />

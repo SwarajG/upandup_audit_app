@@ -40,9 +40,12 @@ export default class PurchaseEntry extends Component<Props> {
     purchaseEntries
   });
 
-  updateModalVisibility = status => () => this.setState({ isVisibleModal: status });
+  updateModalVisibility = status => () => {
+    const editing = !status;
+    this.setState({ isVisibleModal: status, editing });
+  }
 
-  updateDate = date => this.setState({ date });
+  updateDate = date => this.setState({ date }, this.refetchList);
 
   editRow = (rowIndex) => {
     const { purchaseEntries } = this.state;
@@ -51,9 +54,9 @@ export default class PurchaseEntry extends Component<Props> {
       quantity: currentRowData.quantity,
       item: currentRowData.itemId,
       unit: currentRowData.unit,
-      price: currentRowData.price
+      price: currentRowData.price,
+      _id: currentRowData._id
     };
-    console.log(editingData);
     this.setState({
       isVisibleModal: true,
       editing: true,
@@ -80,7 +83,10 @@ export default class PurchaseEntry extends Component<Props> {
       };
       request.getAllpurchaseEntriesForOutlet(purchaseEntryfilters)
         .then(response => response.json())
-        .then(response => this.updateData(outlet, response));
+        .then(response => {
+          console.log('purchaseEntries: ', response);
+          this.updateData(outlet, response);
+        });
   }
 
   renderAddEntryButton = () => (
@@ -116,7 +122,12 @@ export default class PurchaseEntry extends Component<Props> {
     );
   }
 
-  renderDatePicker = () => <DatePicker updateDate={this.updateDate} />;
+  renderDatePicker = () => (
+    <DatePicker
+      updateDate={this.updateDate}
+      date={this.state.date}
+    />
+  )
 
   render() {
     const { isVisibleModal } = this.state;
