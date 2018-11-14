@@ -1,4 +1,4 @@
-const baseUrl = `http://localhost:5000`;
+const baseUrl = `https://upandup-audit-backend.herokuapp.com`;
 
 const headers = {
   Accept: 'application/json',
