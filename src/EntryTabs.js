@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Dimensions } from 'react-native';
+import { Dimensions } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import PurchaseEntry from './PurchaseEntry';
 import StockCounting from './StockCounting';
@@ -35,25 +35,3 @@ export default class EntryTabs extends Component<Props> {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  button: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 25,
-    paddingRight: 25,
-    borderRadius: 3,
-    width: '40%',
-    backgroundColor: '#2196F3',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#FFF'
-  }
-});

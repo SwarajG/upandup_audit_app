@@ -7,6 +7,7 @@ import {
   TextInput,
   AsyncStorage
 } from 'react-native';
+import Modal from 'react-native-modal';
 import Navigator from './Navigator';
 
 type Props = {};
@@ -57,6 +58,15 @@ export default class LoginPage extends Component<Props> {
     }
     return (
       <View style={styles.container}>
+        {/* <Modal
+          isVisible={true}
+        >
+          <View style={styles.test1}>
+            <Text style={{ color: '#000' }}>
+              Hello World
+            </Text>
+          </View>
+        </Modal> */}
         <TextInput
           autoCapitalize={'none'}
           style={styles.input}

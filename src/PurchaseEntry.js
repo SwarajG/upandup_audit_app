@@ -96,15 +96,17 @@ export default class PurchaseEntry extends Component<Props> {
   )
 
   renderTable = () => (
-    <CustomTable
-      data={this.state.purchaseEntries}
-      keys={keys}
-      tableHead={tableHead}
-      widthArr={widthArr}
-      updateModalVisibility={this.updateModalVisibility}
-      editRow={this.editRow}
-      deleteRow={this.deleteRow}
-    />
+    <View style={{ flex: 9 }}>
+      <CustomTable
+        data={this.state.purchaseEntries}
+        keys={keys}
+        tableHead={tableHead}
+        widthArr={widthArr}
+        updateModalVisibility={this.updateModalVisibility}
+        editRow={this.editRow}
+        deleteRow={this.deleteRow}
+      />
+    </View>
   )
 
   renderModal = () => {
@@ -123,10 +125,12 @@ export default class PurchaseEntry extends Component<Props> {
   }
 
   renderDatePicker = () => (
-    <DatePicker
-      updateDate={this.updateDate}
-      date={this.state.date}
-    />
+    <View style={{ marginTop: 10, flex: 1 }}>
+      <DatePicker
+        updateDate={this.updateDate}
+        date={this.state.date}
+      />
+    </View>
   )
 
   render() {
@@ -143,21 +147,9 @@ export default class PurchaseEntry extends Component<Props> {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 10,
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  loaderWrapper: {
-    marginTop: 100
-  },
-  containerWrapper: {
-    marginTop: 50,
-    marginLeft: 15,
-    marginRight: 15
-  },
-  horizontal: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 10
   }
 });

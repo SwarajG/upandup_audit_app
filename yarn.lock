@@ -4427,6 +4427,10 @@ react-native-elements@^0.19.1:
     opencollective "^1.0.3"
     prop-types "^15.5.8"
 
+react-native-floating-labels@^1.1.9:
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/react-native-floating-labels/-/react-native-floating-labels-1.1.9.tgz#d6f096a34f08395c3c7180de112e2769e2eb8ff2"
+
 react-native-modal-datetime-picker@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/react-native-modal-datetime-picker/-/react-native-modal-datetime-picker-6.0.0.tgz#8018994524122ad48fd6bc66f26f623c75a49fb3"

@@ -27,17 +27,17 @@ export default class StockCounting extends Component<Props> {
 
   render() {
     const { date } = this.props;
-    console.log(date);
     const { isDateTimePickerVisible } = this.state;
     const currentDateInFormat = moment(date).format('DD/MM/YYYY');
     return (
       <View>
-        <View>
-          <Text>Date: {currentDateInFormat}</Text>
-          <TouchableOpacity onPress={this.showDateTimePicker}>
-            <Text>Choose date</Text>
-          </TouchableOpacity>
-        </View>
+        <Text style={{ justifyContent: 'center', marginBottom: 5 }}>Date: {currentDateInFormat}</Text>
+        <TouchableOpacity
+          onPress={this.showDateTimePicker}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Choose date</Text>
+        </TouchableOpacity>
         <DateTimePicker
           isVisible={isDateTimePickerVisible}
           onConfirm={this.handleDatePicked}
@@ -56,11 +56,7 @@ const styles = StyleSheet.create({
     paddingLeft: 25,
     paddingRight: 25,
     borderRadius: 3,
-    width: '80%',
     backgroundColor: '#2196F3',
-    display: 'flex',
-    alignItems: 'center',
-    marginBottom: 40
   },
   buttonText: {
     color: '#FFF'

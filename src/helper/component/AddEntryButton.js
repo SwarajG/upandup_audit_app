@@ -27,11 +27,9 @@ const styles = StyleSheet.create({
     paddingLeft: 25,
     paddingRight: 25,
     borderRadius: 3,
-    width: '80%',
     backgroundColor: '#2196F3',
     display: 'flex',
     alignItems: 'center',
-    marginBottom: 40
   },
   buttonText: {
     color: '#FFF'

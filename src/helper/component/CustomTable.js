@@ -18,9 +18,11 @@ export default class CustomTable extends Component<Props> {
   )
 
   renderEmptyTableText = () => (
-    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-      {this.renderAddEntryButton()}
-      <Text>No Entries for this date...</Text>
+    <View style={{ flex: 4, flexDirection: 'column', marginTop: 20 }}>
+      <View style={{ flex: 1, marginTop: 5 }}>
+        {this.renderAddEntryButton()}
+        <Text style={{ marginTop: 15 }}>No Entries for this date...</Text>
+      </View>
     </View>
   )
 
@@ -62,8 +64,10 @@ export default class CustomTable extends Component<Props> {
       return this.renderEmptyTableText();
     }
     return (
-      <View style={[styles.container, styles.containerWrapper]}>
-        {this.renderAddEntryButton()}
+      <View style={styles.containerWrapper}>
+        <View style={{ alignItems: 'center', marginBottom: 10 }}>
+          {this.renderAddEntryButton()}
+        </View>
         <ScrollView horizontal={true}>
           <View>
             <ScrollView style={styles.dataWrapper}>
@@ -80,15 +84,13 @@ export default class CustomTable extends Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   containerWrapper: {
-    marginTop: 50,
+    marginTop: 5,
     marginLeft: 15,
     marginRight: 15
   },
-  row: { flexDirection: 'row', width: '100%' },
+  row: {
+    flexDirection: 'row',
+    width: '100%'
+  },
 });

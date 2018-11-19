@@ -3,10 +3,10 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Picker
 } from 'react-native';
+import FloatingLabel from 'react-native-floating-labels';
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import enums from './helper/enums';
@@ -133,8 +133,7 @@ export default class AddInventoryCountingModal extends Component<Props> {
         <View style={styles.modalWrapper}>
           {this.renderStockMaterials(itemList, item)}
           {this.renderUnit(unit)}
-          <TextInput
-            maxLength={10}
+          <FloatingLabel
             placeholder="quantity"
             defaultValue={quantity.toString()}
             onChangeText={this.onChangedNumberInput('quantity')}
@@ -154,6 +153,9 @@ export default class AddInventoryCountingModal extends Component<Props> {
 
 const styles = StyleSheet.create({
   modalWrapper: {
+    marginTop: 50,
+    marginBottom: 50,
+    padding: 20,
     flex: 1,
     zIndex: 100,
     backgroundColor: '#FFF',
@@ -161,9 +163,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 3,
   },
+  inputWrapper: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   input: {
-    // width: '50%',
-    // justifyContent: 'center'
+    width: '100%',
+    marginBottom: 20
   },
   button: {
     paddingTop: 10,
@@ -171,12 +178,11 @@ const styles = StyleSheet.create({
     paddingLeft: 25,
     paddingRight: 25,
     borderRadius: 3,
-    width: '80%',
     backgroundColor: '#2196F3',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 40
+    marginBottom: 40,
+  },
+  buttonWrapper: {
+    alignItems: 'center'
   },
   buttonText: {
     color: '#FFF'
