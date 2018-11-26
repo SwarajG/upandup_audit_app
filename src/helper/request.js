@@ -20,6 +20,9 @@ const putMethodProps = {
 };
 
 export default {
+  // Users
+  getAllUsers: () => fetch(`${baseUrl}/users`),
+
   // outlets
   getAllOutlets: () => fetch(`${baseUrl}/outlets`),
   createOutlet: outlet => fetch(`${baseUrl}/outlets`, {
@@ -81,6 +84,23 @@ export default {
     body: JSON.stringify(stockTransferData)
   }),
   deleteStockTransferEntry: id => fetch(`${baseUrl}/stockTransferEntries/${id}`, {
+    ...deleteMethodProps,
+  }),
+
+  // Attendance Entries
+  getAllattendanceEntriesForOutlet: attendanceEntryfilters => fetch(`${baseUrl}/attendanceEntries/on-date`, {
+    ...postMethodProps,
+    body: JSON.stringify(attendanceEntryfilters)
+  }),
+  createAttendanceEntry: attendanData => fetch(`${baseUrl}/attendanceEntries`, {
+    ...postMethodProps,
+    body: JSON.stringify(attendanData)
+  }),
+  updateAttendanceEntry: (id, attendanData) => fetch(`${baseUrl}/attendanceEntries/${id}`, {
+    ...putMethodProps,
+    body: JSON.stringify(attendanData)
+  }),
+  deleteAttendanceEntry: id => fetch(`${baseUrl}/attendanceEntries/${id}`, {
     ...deleteMethodProps,
   }),
 };

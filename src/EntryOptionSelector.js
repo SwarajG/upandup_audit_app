@@ -18,6 +18,12 @@ export default class EntryOptionSelector extends Component<Props> {
     navigate('EntryTabs');
   }
 
+  onPressStaffAttendance = () => {
+    const { navigate } = this.props.navigation;
+    alert('Hello World');
+    navigate('StaffAttendance');
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -26,6 +32,12 @@ export default class EntryOptionSelector extends Component<Props> {
           style={styles.button}
         >
           <Text style={styles.buttonText}>Stock & Purchase related entry / edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={this.onPressStaffAttendance}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Staff Attendance</Text>
         </TouchableOpacity>
       </View>
     );
