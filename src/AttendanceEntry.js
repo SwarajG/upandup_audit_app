@@ -126,6 +126,7 @@ export default class AttendanceEntry extends Component<Props> {
       <DatePicker
         updateDate={this.updateDate}
         date={this.state.date}
+        mode="time"
       />
     </View>
   )

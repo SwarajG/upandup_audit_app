@@ -43,6 +43,7 @@ export default class StockCounting extends Component<Props> {
           onConfirm={this.handleDatePicked}
           onCancel={this.hideDateTimePicker}
           date={date}
+          {...this.props}
         />
       </View>
     );

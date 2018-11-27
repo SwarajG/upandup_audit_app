@@ -20,60 +20,59 @@ export default class AddAttendanceEntryModal extends Component<Props> {
     super(props);
     const isEditing = props.editing;
     const { editingData } = props;
-    const quantity = isEditing ? editingData.quantity : 0;
-    const item = isEditing ? editingData.item : '';
-    const unit = isEditing ? editingData.unit : enums.UNITS.KG;
+    const start_time = isEditing ? editingData.start_time : '00:00';
+    const end_time = isEditing ? editingData.end_time : '00:00';
     this.state = {
-      quantity,
-      item,
-      unit,
-      itemList: []
+      start_time,
+      end_time,
+      userEmail: '',
+      userList: []
     };
   }
 
   async componentDidMount() {
-    const { item } = this.state;
+    const { userEmail } = this.state;
     try {
-      const itemListObject = await request.getAllUsers();
-      const itemList = await itemListObject.json();
-      const newItem = item ? item : itemList[0]._id;
-      this.updateData(itemList, newItem);
+      const userListObject = await request.getAllUsers();
+      const userList = await userListObject.json();
+      const newUser = userEmail ? userEmail : userList[0].email;
+      this.updateData(userList, newUser);
     } catch (error) {
       alert('Failed to fetch outlet object...');
     }
   }
 
-  updateData = (itemList, item) => this.setState({ itemList, item });
+  updateData = (userList, userEmail) => this.setState({ userList, userEmail });
 
-  createStockItemEntry = async () => {
+  createAttendanceEntry = async () => {
     const { updateModalVisibility, outletId, date, refetchList, editing } = this.props;
-    const { item, unit, quantity, itemList } = this.state;
-    const selectedItemObject = itemList.find(i => i._id === item);
-    const { _id, name } = selectedItemObject;
+    const { userEmail, start_time, end_time, userList } = this.state;
+    const selectedUserObject = userList.find(i => i.email === userEmail);
+    const { email, _id } = selectedUserObject;
     const isEditing = editing;
     try {
-      const stockItemEntry = {
+      const attendanceEntry = {
         outletId,
-        itemId: _id,
-        itemName: name,
-        unit,
-        quantity: parseInt(quantity, 10),
+        userId: _id,
+        email,
+        start_time,
+        end_time,
         entryDate: moment(date).format('DD/MM/YYYY')
       };
       if (isEditing) {
         const { editingData } = this.props;
-        const responseObject = await request.updateStockItemEntry(editingData._id, { ...stockItemEntry,
+        const responseObject = await request.updateAttendanceEntry(editingData._id, { ...attendanceEntry,
           _id: editingData._id
         });
         const response = await responseObject.json();
       } else {
-        const responseObject = await request.createStockItemEntry(stockItemEntry);
+        const responseObject = await request.createAttendanceEntry(attendanceEntry);
         const response = await responseObject.json();
       }
       refetchList();
       updateModalVisibility(false)();
     } catch (error) {
-      alert('Error while creating stock entry...');
+      alert('Error while creating attendance entry...');
     }
   }
 
@@ -81,49 +80,26 @@ export default class AddAttendanceEntryModal extends Component<Props> {
 
   onChangedNumberInput = key => text => this.setState({ [key]: text.replace(/[^0-9]/g, '') });
 
-  renderItems = itemList => itemList.map(item => (
+  renderUsers = userList => userList.map(user => (
     <Picker.Item
-      key={item._id}
-      label={item.name}
-      value={item._id}
+      key={user._id}
+      label={user.email}
+      value={user._id}
     />
   ))
 
-  renderUnits = () => {
-    const unitsList = [];
-    Object.values(enums.UNITS).forEach(unit => {
-      unitsList.push(
-        <Picker.Item
-          key={unit}
-          label={unit}
-          value={unit}
-        />
-      );
-    });
-    return unitsList;
-  }
-
-  renderStockMaterials = (itemList, item) => (
+  renderStockMaterials = (userList, item) => (
     <Picker
       selectedValue={item}
       onValueChange={this.onValueChange('item')}
     >
-      {this.renderItems(itemList)}
-    </Picker>
-  )
-
-  renderUnit = unit => (
-    <Picker
-      selectedValue={unit}
-      onValueChange={this.onValueChange('unit')}
-    >
-      {this.renderUnits()}
+      {this.renderUsers(userList)}
     </Picker>
   )
 
   render() {
     const { updateModalVisibility } = this.props;
-    const { start_time, end_time, item, unit, itemList } = this.state;
+    const { start_time, end_time, item, unit, userList } = this.state;
     return (
       <Modal
         isVisible={true}
@@ -131,14 +107,14 @@ export default class AddAttendanceEntryModal extends Component<Props> {
         onBackButtonPress={updateModalVisibility(false)}
       >
         <View style={styles.modalWrapper}>
-          {this.renderStockMaterials(itemList, item)}
-          {this.renderUnit(unit)}
-          <FloatingLabel
+          {/* {this.renderStockMaterials(userList, item)}
+          {this.renderUnit(unit)} */}
+          {/* <FloatingLabel
             placeholder="quantity"
             defaultValue={quantity.toString()}
             onChangeText={this.onChangedNumberInput('quantity')}
             style={styles.input}
-          />
+          /> */}
           <TouchableOpacity
             onPress={this.createStockItemEntry}
             style={styles.button}
