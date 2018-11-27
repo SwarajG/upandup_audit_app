@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Picker
 } from 'react-native';
-import FloatingLabel from 'react-native-floating-labels';
+import DatePicker from './helper/component/DatePicker';
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import enums from './helper/enums';
@@ -20,12 +20,13 @@ export default class AddAttendanceEntryModal extends Component<Props> {
     super(props);
     const isEditing = props.editing;
     const { editingData } = props;
+    const userEmail = isEditing ? editingData.userEmail : '';
     const start_time = isEditing ? editingData.start_time : '00:00';
     const end_time = isEditing ? editingData.end_time : '00:00';
     this.state = {
       start_time,
       end_time,
-      userEmail: '',
+      userEmail,
       userList: []
     };
   }
@@ -43,6 +44,13 @@ export default class AddAttendanceEntryModal extends Component<Props> {
   }
 
   updateData = (userList, userEmail) => this.setState({ userList, userEmail });
+
+  updateDate = type => (date) => {
+    const timeInHours = moment(date).format('HH:mm')
+    this.setState({
+      [type]: timeInHours
+    });
+  }
 
   createAttendanceEntry = async () => {
     const { updateModalVisibility, outletId, date, refetchList, editing } = this.props;
@@ -84,22 +92,33 @@ export default class AddAttendanceEntryModal extends Component<Props> {
     <Picker.Item
       key={user._id}
       label={user.email}
-      value={user._id}
+      value={user.email}
     />
   ))
 
-  renderStockMaterials = (userList, item) => (
+  renderUsersList = (userList, userEmail) => (
     <Picker
-      selectedValue={item}
-      onValueChange={this.onValueChange('item')}
+      selectedValue={userEmail}
+      onValueChange={this.onValueChange('userEmail')}
     >
       {this.renderUsers(userList)}
     </Picker>
   )
 
+  renderTimePicker = (type, time, title) => (
+    <View style={{ marginTop: 10, flex: 4 }}>
+      <Text style={styles.inputTitle}>{title}</Text>
+      <DatePicker
+        updateDate={this.updateDate(type)}
+        mode="time"
+        time={time}
+      />
+    </View>
+  )
+
   render() {
     const { updateModalVisibility } = this.props;
-    const { start_time, end_time, item, unit, userList } = this.state;
+    const { start_time, end_time, userEmail, userList } = this.state;
     return (
       <Modal
         isVisible={true}
@@ -107,16 +126,12 @@ export default class AddAttendanceEntryModal extends Component<Props> {
         onBackButtonPress={updateModalVisibility(false)}
       >
         <View style={styles.modalWrapper}>
-          {/* {this.renderStockMaterials(userList, item)}
-          {this.renderUnit(unit)} */}
-          {/* <FloatingLabel
-            placeholder="quantity"
-            defaultValue={quantity.toString()}
-            onChangeText={this.onChangedNumberInput('quantity')}
-            style={styles.input}
-          /> */}
+          <Text style={{ fontSize: 24, marginBottom: 40, flex: 1 }}>Add Attendance</Text>
+          {this.renderTimePicker('start_time', start_time)}
+          {this.renderTimePicker('end_time', end_time)}
+          {this.renderUsersList(userList, userEmail)}
           <TouchableOpacity
-            onPress={this.createStockItemEntry}
+            onPress={this.createAttendanceEntry}
             style={styles.button}
           >
             <Text style={styles.buttonText}>Submit</Text>
@@ -128,14 +143,18 @@ export default class AddAttendanceEntryModal extends Component<Props> {
 }
 
 const styles = StyleSheet.create({
+  inputTitle: {
+    marginBottom: 10,
+    fontSize: 14,
+  },
   modalWrapper: {
     marginTop: 50,
     marginBottom: 50,
     padding: 20,
-    flex: 1,
+    flex: 10,
     zIndex: 100,
     backgroundColor: '#FFF',
-    alignContent: 'center',
+    alignContent: 'flex-start',
     justifyContent: 'center',
     borderRadius: 3,
   },
@@ -156,6 +175,9 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#2196F3',
     marginBottom: 40,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   buttonWrapper: {
     alignItems: 'center'

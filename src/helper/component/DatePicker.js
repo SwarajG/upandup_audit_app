@@ -8,10 +8,8 @@ import {
 import moment from 'moment';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 
-const currentDate = new Date();
-
 type Props = {};
-export default class StockCounting extends Component<Props> {
+export default class DatePicker extends Component<Props> {
   state = {
     isDateTimePickerVisible: false
   };
@@ -26,17 +24,19 @@ export default class StockCounting extends Component<Props> {
   };
 
   render() {
-    const { date } = this.props;
+    const { date, mode, time } = this.props;
     const { isDateTimePickerVisible } = this.state;
     const currentDateInFormat = moment(date).format('DD/MM/YYYY');
+    const currentInfo = mode === 'time' ? time : currentDateInFormat;
+    const title = mode === 'time' ? 'Time' : 'Date';
     return (
-      <View>
-        <Text style={{ justifyContent: 'center', marginBottom: 5 }}>Date: {currentDateInFormat}</Text>
+      <View style={{ flex: 1, flexDirection: 'column', alignContent: 'center', alignItems: 'center' }}>
+        <Text style={{ justifyContent: 'center', marginBottom: 5 }}>{title}: {currentInfo}</Text>
         <TouchableOpacity
           onPress={this.showDateTimePicker}
           style={styles.button}
         >
-          <Text style={styles.buttonText}>Choose date</Text>
+          <Text style={styles.buttonText}>Choose {title.toLowerCase()}</Text>
         </TouchableOpacity>
         <DateTimePicker
           isVisible={isDateTimePickerVisible}

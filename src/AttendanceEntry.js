@@ -12,9 +12,9 @@ import AddAttendanceEntryModal from './AddAttendanceEntryModal';
 import request from './helper/request';
 
 const currentDate = new Date();
-const keys = ['itemName', 'unit', 'quantity', 'price'];
-const tableHead = ['Name', 'Unit', 'Quantity', 'Price', '', ''];
-const widthArr = [160, 50, 80, 80, 80, 80];
+const keys = ['email', 'start_time', 'end_time'];
+const tableHead = ['Email', 'Start Time', 'End Time', '', ''];
+const widthArr = [160, 50, 80, 80, 80];
 
 type Props = {};
 export default class AttendanceEntry extends Component<Props> {
@@ -51,10 +51,9 @@ export default class AttendanceEntry extends Component<Props> {
     const { attendanceEntries } = this.state;
     const currentRowData = attendanceEntries[rowIndex];
     const editingData = {
-      quantity: currentRowData.quantity,
-      item: currentRowData.itemId,
-      unit: currentRowData.unit,
-      price: currentRowData.price,
+      userEmail: currentRowData.email,
+      start_time: currentRowData.start_time,
+      end_time: currentRowData.end_time,
       _id: currentRowData._id
     };
     this.setState({
@@ -110,7 +109,7 @@ export default class AttendanceEntry extends Component<Props> {
     const { outlet, date, editing, editingData } = this.state;
     const outletId = outlet._id;
     return (
-      <AddPurchaseEntryModal
+      <AddAttendanceEntryModal
         updateModalVisibility={this.updateModalVisibility}
         outletId={outletId}
         date={date}
@@ -126,7 +125,6 @@ export default class AttendanceEntry extends Component<Props> {
       <DatePicker
         updateDate={this.updateDate}
         date={this.state.date}
-        mode="time"
       />
     </View>
   )

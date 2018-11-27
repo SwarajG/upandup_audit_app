@@ -20,7 +20,6 @@ export default class EntryOptionSelector extends Component<Props> {
 
   onPressStaffAttendance = () => {
     const { navigate } = this.props.navigation;
-    alert('Hello World');
     navigate('StaffAttendance');
   }
 
