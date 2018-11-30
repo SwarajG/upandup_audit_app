@@ -5,11 +5,11 @@ import {
   AsyncStorage,
 } from 'react-native';
 import moment from 'moment';
-import AddEntryButton from './helper/component/AddEntryButton';
-import CustomTable from './helper/component/CustomTable';
-import DatePicker from './helper/component/DatePicker';
-import AddUpdateStockTransferModal from './AddUpdateStockTransferModal';
-import request from './helper/request';
+import AddEntryButton from '../helper/component/AddEntryButton';
+import CustomTable from '../helper/component/CustomTable';
+import DatePicker from '../helper/component/DatePicker';
+import AddUpdateStockTransferModal from '../Popups/AddUpdateStockTransferModal';
+import request from '../helper/request';
 
 const currentDate = new Date();
 const tableHead = ['Name', 'Unit', 'Quantity', 'Transfered to', '', ''];

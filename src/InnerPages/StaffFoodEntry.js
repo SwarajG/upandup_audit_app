@@ -5,21 +5,21 @@ import {
   AsyncStorage,
 } from 'react-native';
 import moment from 'moment';
-import AddEntryButton from './helper/component/AddEntryButton';
-import CustomTable from './helper/component/CustomTable';
-import DatePicker from './helper/component/DatePicker';
-import AddAttendanceEntryModal from './AddAttendanceEntryModal';
-import request from './helper/request';
+import AddEntryButton from '../helper/component/AddEntryButton';
+import CustomTable from '../helper/component/CustomTable';
+import DatePicker from '../helper/component/DatePicker';
+import AddUpdateStaffFoodEntryModal from '../Popups/AddUpdateStaffFoodEntryModal';
+import request from '../helper/request';
 
 const currentDate = new Date();
-const keys = ['email', 'start_time', 'end_time'];
-const tableHead = ['Email', 'Start Time', 'End Time', '', ''];
-const widthArr = [160, 50, 80, 80, 80];
+const keys = ['firstName', 'lastName', 'itemName', 'mealType', 'foodTime'];
+const tableHead = ['First Name', 'Last Name', 'Meal Type', 'Time', '', ''];
+const widthArr = [100, 100, 150, 80, 80, 80];
 
 type Props = {};
-export default class AttendanceEntry extends Component<Props> {
+export default class StaffFoodEntry extends Component<Props> {
   state = {
-    attendanceEntries: [],
+    staffFoodEntries: [],
     isVisibleModal: false,
     outlet: {},
     date: currentDate,
@@ -35,9 +35,9 @@ export default class AttendanceEntry extends Component<Props> {
     }
   }
 
-  updateData = (outlet, attendanceEntries) => this.setState({
+  updateData = (outlet, staffFoodEntries) => this.setState({
     outlet,
-    attendanceEntries
+    staffFoodEntries
   });
 
   updateModalVisibility = status => () => {
@@ -48,12 +48,13 @@ export default class AttendanceEntry extends Component<Props> {
   updateDate = date => this.setState({ date }, this.refetchList);
 
   editRow = (rowIndex) => {
-    const { attendanceEntries } = this.state;
-    const currentRowData = attendanceEntries[rowIndex];
+    const { staffFoodEntries } = this.state;
+    const currentRowData = staffFoodEntries[rowIndex];
     const editingData = {
       userEmail: currentRowData.email,
-      start_time: currentRowData.start_time,
-      end_time: currentRowData.end_time,
+      foodTime: currentRowData.foodTime,
+      mealType: currentRowData.mealType,
+      itemName: currentRowData.itemName,
       _id: currentRowData._id
     };
     this.setState({
@@ -64,11 +65,14 @@ export default class AttendanceEntry extends Component<Props> {
   }
 
   deleteRow = async (rowIndex) => {
-    const { attendanceEntries } = this.state;
-    const entryId = attendanceEntries[rowIndex]._id;
-    const responseObject = await request.deleteAttendanceEntry(entryId);
-    const response = await responseObject.json();
-    this.refetchList();
+    const { staffFoodEntries } = this.state;
+    const entryId = staffFoodEntries[rowIndex]._id;
+    try {
+      await request.deleteStaffFoodEntry(entryId);
+      this.refetchList(); 
+    } catch (error) {
+      alert('Error while deleting the entry...', error);
+    }
   }
 
   refetchList = async () => {
@@ -76,11 +80,11 @@ export default class AttendanceEntry extends Component<Props> {
     const outletObject = await AsyncStorage.getItem('outlet');
 
       const outlet = JSON.parse(outletObject);
-      const attendanceEntryfilters = {
+      const staffEntryfilters = {
         outletId: outlet._id,
         date: moment(date).format('DD/MM/YYYY')
       };
-      request.getAllattendanceEntriesForOutlet(attendanceEntryfilters)
+      request.getAllstaffFoodEntriesForOutlet(staffEntryfilters)
         .then(response => response.json())
         .then(response => this.updateData(outlet, response));
   }
@@ -94,7 +98,7 @@ export default class AttendanceEntry extends Component<Props> {
   renderTable = () => (
     <View style={{ flex: 9 }}>
       <CustomTable
-        data={this.state.attendanceEntries}
+        data={this.state.staffFoodEntries}
         keys={keys}
         tableHead={tableHead}
         widthArr={widthArr}
@@ -109,7 +113,7 @@ export default class AttendanceEntry extends Component<Props> {
     const { outlet, date, editing, editingData } = this.state;
     const outletId = outlet._id;
     return (
-      <AddAttendanceEntryModal
+      <AddUpdateStaffFoodEntryModal
         updateModalVisibility={this.updateModalVisibility}
         outletId={outletId}
         date={date}

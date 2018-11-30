@@ -1,5 +1,5 @@
-const baseUrl = `https://upandup-audit-backend.herokuapp.com`;
-// const baseUrl = `http://192.168.0.105:5000`;
+// const baseUrl = `https://upandup-audit-backend.herokuapp.com`;
+const baseUrl = `http://192.168.0.100:5000`;
 
 const headers = {
   Accept: 'application/json',
@@ -93,15 +93,32 @@ export default {
     ...postMethodProps,
     body: JSON.stringify(attendanceEntryfilters)
   }),
-  createAttendanceEntry: attendanData => fetch(`${baseUrl}/attendanceEntries`, {
+  createAttendanceEntry: attendanceData => fetch(`${baseUrl}/attendanceEntries`, {
     ...postMethodProps,
-    body: JSON.stringify(attendanData)
+    body: JSON.stringify(attendanceData)
   }),
-  updateAttendanceEntry: (id, attendanData) => fetch(`${baseUrl}/attendanceEntries/${id}`, {
+  updateAttendanceEntry: (id, attendanceData) => fetch(`${baseUrl}/attendanceEntries/${id}`, {
     ...putMethodProps,
-    body: JSON.stringify(attendanData)
+    body: JSON.stringify(attendanceData)
   }),
   deleteAttendanceEntry: id => fetch(`${baseUrl}/attendanceEntries/${id}`, {
+    ...deleteMethodProps,
+  }),
+
+  // Staff Food Entry 
+  getAllstaffFoodEntriesForOutlet: staffFoodEntryfilters => fetch(`${baseUrl}/staffFoodEntries/on-date`, {
+    ...postMethodProps,
+    body: JSON.stringify(staffFoodEntryfilters)
+  }),
+  createStaffFoodEntry: staffFoodEntryData => fetch(`${baseUrl}/staffFoodEntries`, {
+    ...postMethodProps,
+    body: JSON.stringify(staffFoodEntryData)
+  }),
+  updateStaffFoodEntry: (id, staffFoodEntryData) => fetch(`${baseUrl}/staffFoodEntries/${id}`, {
+    ...putMethodProps,
+    body: JSON.stringify(staffFoodEntryData)
+  }),
+  deleteStaffFoodEntry: id => fetch(`${baseUrl}/staffFoodEntries/${id}`, {
     ...deleteMethodProps,
   }),
 };

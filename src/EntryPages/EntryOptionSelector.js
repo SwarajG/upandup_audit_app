@@ -23,6 +23,11 @@ export default class EntryOptionSelector extends Component<Props> {
     navigate('StaffAttendance');
   }
 
+  onPressStaffFoodEntry = () => {
+    const { navigate } = this.props.navigation;
+    navigate('StaffFoodEntry');
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -37,6 +42,12 @@ export default class EntryOptionSelector extends Component<Props> {
           style={styles.button}
         >
           <Text style={styles.buttonText}>Staff Attendance</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={this.onPressStaffFoodEntry}
+          style={styles.button}
+        >
+          <Text style={styles.buttonText}>Staff Food Entry</Text>
         </TouchableOpacity>
       </View>
     );

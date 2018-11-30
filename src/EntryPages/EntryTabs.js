@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Dimensions } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
-import PurchaseEntry from './PurchaseEntry';
-import StockCounting from './StockCounting';
-import StockTransfer from './StockTransfer';
+import PurchaseEntry from '../InnerPages/PurchaseEntry';
+import StockCounting from '../InnerPages/StockCounting';
+import StockTransfer from '../InnerPages/StockTransfer';
 
 const FirstRoute = () => <PurchaseEntry />;
 const SecondRoute = () => <StockCounting />;

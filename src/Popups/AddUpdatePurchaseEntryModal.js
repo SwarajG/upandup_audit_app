@@ -9,8 +9,8 @@ import {
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import FloatingLabel from 'react-native-floating-labels';
-import enums from './helper/enums';
-import request from './helper/request';
+import enums from '../helper/enums';
+import request from '../helper/request';
 
 type Props = {
   isVisibleModal: Boolean
@@ -65,14 +65,12 @@ export default class AddPurchaseEntryModal extends Component<Props> {
       };
       if (isEditing) {
         const { editingData } = this.props;
-        const responseObject = await request.updatePurchaseEntry(editingData._id, {
+        await request.updatePurchaseEntry(editingData._id, {
           ...purchaseEntry,
           _id: editingData._id
         });
-        const response = await responseObject.json();
       } else {
-        const responseObject = await request.createPurchaseEntry(purchaseEntry);
-        const response = await responseObject.json();
+        await request.createPurchaseEntry(purchaseEntry);
       }
       refetchList();
       updateModalVisibility(false)();

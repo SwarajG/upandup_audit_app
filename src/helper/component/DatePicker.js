@@ -24,11 +24,11 @@ export default class DatePicker extends Component<Props> {
   };
 
   render() {
-    const { date, mode, time } = this.props;
+    const { date, mode, time, dateTitle } = this.props;
     const { isDateTimePickerVisible } = this.state;
     const currentDateInFormat = moment(date).format('DD/MM/YYYY');
     const currentInfo = mode === 'time' ? time : currentDateInFormat;
-    const title = mode === 'time' ? 'Time' : 'Date';
+    const title = dateTitle || (mode === 'time' ? 'Time' : 'Date');
     return (
       <View style={{ flex: 1, flexDirection: 'column', alignContent: 'center', alignItems: 'center' }}>
         <Text style={{ justifyContent: 'center', marginBottom: 5 }}>{title}: {currentInfo}</Text>

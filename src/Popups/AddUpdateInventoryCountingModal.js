@@ -9,8 +9,8 @@ import {
 import FloatingLabel from 'react-native-floating-labels';
 import moment from 'moment';
 import Modal from 'react-native-modal';
-import enums from './helper/enums';
-import request from './helper/request';
+import enums from '../helper/enums';
+import request from '../helper/request';
 
 type Props = {
   isVisibleModal: Boolean
@@ -62,13 +62,11 @@ export default class AddInventoryCountingModal extends Component<Props> {
       };
       if (isEditing) {
         const { editingData } = this.props;
-        const responseObject = await request.updateStockItemEntry(editingData._id, { ...stockItemEntry,
+        await request.updateStockItemEntry(editingData._id, { ...stockItemEntry,
           _id: editingData._id
         });
-        const response = await responseObject.json();
       } else {
-        const responseObject = await request.createStockItemEntry(stockItemEntry);
-        const response = await responseObject.json();
+        await request.createStockItemEntry(stockItemEntry);
       }
       refetchList();
       updateModalVisibility(false)();

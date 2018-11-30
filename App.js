@@ -5,9 +5,9 @@ import {
   StyleSheet,
   View
 } from 'react-native';
-import Navigator from './src/Navigator';
+import Navigator from './src/EntryPages/Navigator';
 import enums from './src/helper/enums';
-import LoginPage from './src/LoginPage';
+import LoginPage from './src/EntryPages/LoginPage';
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -42,7 +42,7 @@ export default class App extends Component<Props> {
     }
     return <Navigator user={loggedInUser} />;
   }
-};
+}
 
 const styles = StyleSheet.create({
   container: {

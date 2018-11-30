@@ -6,26 +6,25 @@ import {
   TouchableOpacity,
   Picker
 } from 'react-native';
-import DatePicker from './helper/component/DatePicker';
+import DatePicker from '../helper/component/DatePicker';
 import moment from 'moment';
 import Modal from 'react-native-modal';
-import enums from './helper/enums';
-import request from './helper/request';
+import request from '../helper/request';
 
 type Props = {
   isVisibleModal: Boolean
 };
-export default class AddAttendanceEntryModal extends Component<Props> {
+export default class AddUpdateAttendanceEntryModal extends Component<Props> {
   constructor(props) {
     super(props);
     const isEditing = props.editing;
     const { editingData } = props;
     const userEmail = isEditing ? editingData.userEmail : '';
-    const start_time = isEditing ? editingData.start_time : '00:00';
-    const end_time = isEditing ? editingData.end_time : '00:00';
+    const startTime = isEditing ? editingData.startTime : '00:00';
+    const endTime = isEditing ? editingData.endTime : '00:00';
     this.state = {
-      start_time,
-      end_time,
+      startTime,
+      endTime,
       userEmail,
       userList: []
     };
@@ -54,7 +53,7 @@ export default class AddAttendanceEntryModal extends Component<Props> {
 
   createAttendanceEntry = async () => {
     const { updateModalVisibility, outletId, date, refetchList, editing } = this.props;
-    const { userEmail, start_time, end_time, userList } = this.state;
+    const { userEmail, startTime, endTime, userList } = this.state;
     const selectedUserObject = userList.find(i => i.email === userEmail);
     const { email, _id } = selectedUserObject;
     const isEditing = editing;
@@ -63,19 +62,17 @@ export default class AddAttendanceEntryModal extends Component<Props> {
         outletId,
         userId: _id,
         email,
-        start_time,
-        end_time,
+        startTime,
+        endTime,
         entryDate: moment(date).format('DD/MM/YYYY')
       };
       if (isEditing) {
         const { editingData } = this.props;
-        const responseObject = await request.updateAttendanceEntry(editingData._id, { ...attendanceEntry,
+        await request.updateAttendanceEntry(editingData._id, { ...attendanceEntry,
           _id: editingData._id
         });
-        const response = await responseObject.json();
       } else {
-        const responseObject = await request.createAttendanceEntry(attendanceEntry);
-        const response = await responseObject.json();
+        await request.createAttendanceEntry(attendanceEntry);
       }
       refetchList();
       updateModalVisibility(false)();
@@ -118,7 +115,7 @@ export default class AddAttendanceEntryModal extends Component<Props> {
 
   render() {
     const { updateModalVisibility } = this.props;
-    const { start_time, end_time, userEmail, userList } = this.state;
+    const { startTime, endTime, userEmail, userList } = this.state;
     return (
       <Modal
         isVisible={true}
@@ -127,9 +124,9 @@ export default class AddAttendanceEntryModal extends Component<Props> {
       >
         <View style={styles.modalWrapper}>
           <Text style={{ fontSize: 24, marginBottom: 40, flex: 1 }}>Add Attendance</Text>
-          {this.renderTimePicker('start_time', start_time)}
-          {this.renderTimePicker('end_time', end_time)}
           {this.renderUsersList(userList, userEmail)}
+          {this.renderTimePicker('startTime', startTime)}
+          {this.renderTimePicker('endTime', endTime)}
           <TouchableOpacity
             onPress={this.createAttendanceEntry}
             style={styles.button}

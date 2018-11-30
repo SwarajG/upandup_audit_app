@@ -7,7 +7,7 @@ import {
   Picker,
   AsyncStorage
 } from 'react-native';
-import request from './helper/request';
+import request from '../helper/request';
 
 type Props = {};
 export default class OutletSelector extends Component<Props> {

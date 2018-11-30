@@ -5,21 +5,21 @@ import {
   AsyncStorage,
 } from 'react-native';
 import moment from 'moment';
-import AddEntryButton from './helper/component/AddEntryButton';
-import CustomTable from './helper/component/CustomTable';
-import DatePicker from './helper/component/DatePicker';
-import AddPurchaseEntryModal from './AddUpdatePurchaseEntryModal';
-import request from './helper/request';
+import AddEntryButton from '../helper/component/AddEntryButton';
+import CustomTable from '../helper/component/CustomTable';
+import DatePicker from '../helper/component/DatePicker';
+import AddUpdateAttendanceEntryModal from '../Popups/AddUpdateAttendanceEntryModal';
+import request from '../helper/request';
 
 const currentDate = new Date();
-const keys = ['itemName', 'unit', 'quantity', 'price'];
-const tableHead = ['Name', 'Unit', 'Quantity', 'Price', '', ''];
-const widthArr = [160, 50, 80, 80, 80, 80];
+const keys = ['firstName', 'lastName', 'startTime', 'endTime'];
+const tableHead = ['First Name', 'Last Name', 'Start Time', 'End Time', '', ''];
+const widthArr = [100, 100, 50, 80, 80, 80];
 
 type Props = {};
-export default class PurchaseEntry extends Component<Props> {
+export default class AttendanceEntry extends Component<Props> {
   state = {
-    purchaseEntries: [],
+    attendanceEntries: [],
     isVisibleModal: false,
     outlet: {},
     date: currentDate,
@@ -35,9 +35,9 @@ export default class PurchaseEntry extends Component<Props> {
     }
   }
 
-  updateData = (outlet, purchaseEntries) => this.setState({
+  updateData = (outlet, attendanceEntries) => this.setState({
     outlet,
-    purchaseEntries
+    attendanceEntries
   });
 
   updateModalVisibility = status => () => {
@@ -48,13 +48,12 @@ export default class PurchaseEntry extends Component<Props> {
   updateDate = date => this.setState({ date }, this.refetchList);
 
   editRow = (rowIndex) => {
-    const { purchaseEntries } = this.state;
-    const currentRowData = purchaseEntries[rowIndex];
+    const { attendanceEntries } = this.state;
+    const currentRowData = attendanceEntries[rowIndex];
     const editingData = {
-      quantity: currentRowData.quantity,
-      item: currentRowData.itemId,
-      unit: currentRowData.unit,
-      price: currentRowData.price,
+      userEmail: currentRowData.email,
+      startTime: currentRowData.startTime,
+      endTime: currentRowData.endTime,
       _id: currentRowData._id
     };
     this.setState({
@@ -65,9 +64,9 @@ export default class PurchaseEntry extends Component<Props> {
   }
 
   deleteRow = async (rowIndex) => {
-    const { purchaseEntries } = this.state;
-    const entryId = purchaseEntries[rowIndex]._id;
-    const responseObject = await request.deletePurchaseEntry(entryId);
+    const { attendanceEntries } = this.state;
+    const entryId = attendanceEntries[rowIndex]._id;
+    const responseObject = await request.deleteAttendanceEntry(entryId);
     const response = await responseObject.json();
     this.refetchList();
   }
@@ -77,16 +76,13 @@ export default class PurchaseEntry extends Component<Props> {
     const outletObject = await AsyncStorage.getItem('outlet');
 
       const outlet = JSON.parse(outletObject);
-      const purchaseEntryfilters = {
+      const attendanceEntryfilters = {
         outletId: outlet._id,
         date: moment(date).format('DD/MM/YYYY')
       };
-      request.getAllpurchaseEntriesForOutlet(purchaseEntryfilters)
+      request.getAllattendanceEntriesForOutlet(attendanceEntryfilters)
         .then(response => response.json())
-        .then(response => {
-          console.log('purchaseEntries: ', response);
-          this.updateData(outlet, response);
-        });
+        .then(response => this.updateData(outlet, response));
   }
 
   renderAddEntryButton = () => (
@@ -98,7 +94,7 @@ export default class PurchaseEntry extends Component<Props> {
   renderTable = () => (
     <View style={{ flex: 9 }}>
       <CustomTable
-        data={this.state.purchaseEntries}
+        data={this.state.attendanceEntries}
         keys={keys}
         tableHead={tableHead}
         widthArr={widthArr}
@@ -113,7 +109,7 @@ export default class PurchaseEntry extends Component<Props> {
     const { outlet, date, editing, editingData } = this.state;
     const outletId = outlet._id;
     return (
-      <AddPurchaseEntryModal
+      <AddUpdateAttendanceEntryModal
         updateModalVisibility={this.updateModalVisibility}
         outletId={outletId}
         date={date}

@@ -4,5 +4,9 @@ export default {
     KG: 'KG',
     UNIT: 'UNIT',
     LITER: 'LITER'
+  },
+  FOOD_TIME: {
+    LUNCH: 'LUNCH',
+    DINNER: 'DINNER'
   }
 };
