@@ -67,8 +67,7 @@ export default class PurchaseEntry extends Component<Props> {
   deleteRow = async (rowIndex) => {
     const { purchaseEntries } = this.state;
     const entryId = purchaseEntries[rowIndex]._id;
-    const responseObject = await request.deletePurchaseEntry(entryId);
-    const response = await responseObject.json();
+    await request.deletePurchaseEntry(entryId);
     this.refetchList();
   }
 
@@ -83,10 +82,7 @@ export default class PurchaseEntry extends Component<Props> {
       };
       request.getAllpurchaseEntriesForOutlet(purchaseEntryfilters)
         .then(response => response.json())
-        .then(response => {
-          console.log('purchaseEntries: ', response);
-          this.updateData(outlet, response);
-        });
+        .then(response => this.updateData(outlet, response));
   }
 
   renderAddEntryButton = () => (

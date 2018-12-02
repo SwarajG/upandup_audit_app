@@ -2,16 +2,17 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  Text,
-  TouchableOpacity,
   Picker
 } from 'react-native';
 import FloatingLabel from 'react-native-floating-labels';
+import Modal from 'react-native-modal';
 import DatePicker from '../helper/component/DatePicker';
+import PopupHeader from '../helper/component/PopupHeader';
+import SubmitButton from '../helper/component/SubmitButton';
 import moment from 'moment';
 import enums from '../helper/enums';
-import Modal from 'react-native-modal';
 import request from '../helper/request';
+import { commonStyles } from '../helper/styles';
 
 type Props = {
   isVisibleModal: Boolean
@@ -21,9 +22,10 @@ export default class AddUpdateStaffFoodEntryModal extends Component<Props> {
     super(props);
     const isEditing = props.editing;
     const { editingData } = props;
+    const currentTime = moment(new Date()).format('HH:mm');
     const userEmail = isEditing ? editingData.userEmail : '';
     const mealType = isEditing ? editingData.mealType : enums.FOOD_TIME.LUNCH;
-    const foodTime = isEditing ? editingData.foodTime : '00:00';
+    const foodTime = isEditing ? editingData.foodTime : currentTime;
     const itemName = isEditing ? editingData.itemName : '';
     const foodTimeType = isEditing ? editingData.foodTimeType : enums.FOOD_TIME.LUNCH;
     this.state = {
@@ -57,7 +59,7 @@ export default class AddUpdateStaffFoodEntryModal extends Component<Props> {
     });
   }
 
-  createAttendanceEntry = async () => {
+  createStaffFoodEntry = async () => {
     const { updateModalVisibility, outletId, date, refetchList, editing } = this.props;
     const { userEmail, foodTime, userList, foodTimeType, itemName } = this.state;
     const selectedUserObject = userList.find(i => i.email === userEmail);
@@ -90,8 +92,6 @@ export default class AddUpdateStaffFoodEntryModal extends Component<Props> {
 
   onValueChange = key => value => this.setState({ [key]: value });
 
-  onChangedNumberInput = key => text => this.setState({ [key]: text.replace(/[^0-9]/g, '') });
-
   renderUsers = userList => userList.map(user => (
     <Picker.Item
       key={user._id}
@@ -104,40 +104,38 @@ export default class AddUpdateStaffFoodEntryModal extends Component<Props> {
     <Picker
       selectedValue={userEmail}
       onValueChange={this.onValueChange('userEmail')}
+      style={styles.pickerStyle}
     >
       {this.renderUsers(userList)}
     </Picker>
   )
 
   renderTimePicker = (type, time, title) => (
-    <View style={{ marginTop: 10, flex: 4 }}>
-      <DatePicker
-        updateDate={this.updateDate(type)}
-        mode="time"
-        time={time}
-        dateTitle={title}
-      />
-    </View>
+    <DatePicker
+      updateDate={this.updateDate(type)}
+      mode="time"
+      time={time}
+      dateTitle={title}
+    />
   )
 
   renderEatingTime = () => (
-    <View style={{ marginTop: 10, flex: 4 }}>
-      <Picker
-        selectedValue={this.state.foodTimeType}
-        onValueChange={this.onValueChange('foodTimeType')}
-      >
-        <Picker.Item
-          key={enums.FOOD_TIME.LUNCH}
-          label={enums.FOOD_TIME.LUNCH}
-          value={enums.FOOD_TIME.LUNCH}
-        />
-        <Picker.Item
-          key={enums.FOOD_TIME.DINNER}
-          label={enums.FOOD_TIME.DINNER}
-          value={enums.FOOD_TIME.DINNER}
-        />
-      </Picker>
-    </View>
+    <Picker
+      selectedValue={this.state.foodTimeType}
+      onValueChange={this.onValueChange('foodTimeType')}
+      style={styles.pickerStyle}
+    >
+      <Picker.Item
+        key={enums.FOOD_TIME.LUNCH}
+        label={enums.FOOD_TIME.LUNCH}
+        value={enums.FOOD_TIME.LUNCH}
+      />
+      <Picker.Item
+        key={enums.FOOD_TIME.DINNER}
+        label={enums.FOOD_TIME.DINNER}
+        value={enums.FOOD_TIME.DINNER}
+      />
+    </Picker>
   )
 
   renderItemName = itemName => (
@@ -150,27 +148,27 @@ export default class AddUpdateStaffFoodEntryModal extends Component<Props> {
     </FloatingLabel>
   )
 
+  renderSubmitButton = () => <SubmitButton  onPress={this.createStaffFoodEntry} />
+
   render() {
-    const { updateModalVisibility } = this.props;
+    const { updateModalVisibility, isEditing } = this.props;
     const { foodTime, userEmail, userList, itemName } = this.state;
+    const text = isEditing ? 'Update Staff Food Entry' : 'Add Staff Food Entry';
     return (
       <Modal
         isVisible={true}
-        onBackdropPress={updateModalVisibility(false)}
         onBackButtonPress={updateModalVisibility(false)}
+        style={styles.modalWrapper}
       >
-        <View style={styles.modalWrapper}>
-          <Text style={{ fontSize: 24, marginBottom: 40, flex: 1 }}>Add Food Entry</Text>
+        <View style={{ flex: 2 }}>
+          <PopupHeader text={text} updateModalVisibility={updateModalVisibility} />
+        </View>
+        <View style={{ flex: 9, alignItems: 'center' }}>
           {this.renderUsersList(userList, userEmail)}
           {this.renderEatingTime()}
           {this.renderItemName(itemName)}
           {this.renderTimePicker('foodTime', foodTime, 'Eating Time')}
-          <TouchableOpacity
-            onPress={this.createAttendanceEntry}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+          {this.renderSubmitButton()}
         </View>
       </Modal>
     );
@@ -178,46 +176,5 @@ export default class AddUpdateStaffFoodEntryModal extends Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  inputTitle: {
-    marginBottom: 10,
-    fontSize: 14,
-  },
-  modalWrapper: {
-    marginTop: 50,
-    marginBottom: 50,
-    padding: 20,
-    flex: 10,
-    zIndex: 100,
-    backgroundColor: '#FFF',
-    alignContent: 'flex-start',
-    justifyContent: 'center',
-    borderRadius: 3,
-  },
-  inputWrapper: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    marginBottom: 20
-  },
-  button: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 25,
-    paddingRight: 25,
-    borderRadius: 3,
-    backgroundColor: '#2196F3',
-    marginBottom: 40,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  buttonWrapper: {
-    alignItems: 'center'
-  },
-  buttonText: {
-    color: '#FFF'
-  }
+  ...commonStyles,
 });

@@ -59,8 +59,8 @@ export default class OutletSelector extends Component<Props> {
       <View style={styles.container}>
         <Picker
           selectedValue={outlet}
-          style={{ width: '60%' }}
           onValueChange={this.onValueChange}
+          style={{ width: '60%', marginBottom: 15 }}
         >
           {this.renderItems(outletsList)}
         </Picker>
@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
   button: {
     paddingTop: 10,

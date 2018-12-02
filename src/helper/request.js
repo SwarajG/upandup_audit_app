@@ -1,5 +1,5 @@
-// const baseUrl = `https://upandup-audit-backend.herokuapp.com`;
-const baseUrl = `http://192.168.0.100:5000`;
+const baseUrl = `https://upandup-audit-backend.herokuapp.com`;
+// const baseUrl = `http://192.168.0.100:5000`;
 
 const headers = {
   Accept: 'application/json',

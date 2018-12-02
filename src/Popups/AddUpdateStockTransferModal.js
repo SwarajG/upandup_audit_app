@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  Text,
-  TouchableOpacity,
   Picker
 } from 'react-native';
 import FloatingLabel from 'react-native-floating-labels';
 import moment from 'moment';
 import Modal from 'react-native-modal';
+import PopupHeader from '../helper/component/PopupHeader';
+import SubmitButton from '../helper/component/SubmitButton';
+import { commonStyles } from '../helper/styles';
 import enums from '../helper/enums';
 import request from '../helper/request';
 
@@ -19,11 +20,11 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
   constructor(props) {
     super(props);
     const isEditing = props.editing;
-    const { editingData } = props;
+    const { editingData, outlets } = props;
     const quantity = isEditing ? editingData.quantity : 0;
     const item = isEditing ? editingData.item : '';
     const unit = isEditing ? editingData.unit : enums.UNITS.KG;
-    const outlet = isEditing ? editingData.outlet : '';
+    const outlet = isEditing ? editingData.outlet : outlets[0]._id;
     this.state = {
       quantity,
       item,
@@ -45,12 +46,6 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { outlet } = nextProps;
-    const newOutlet = outlet ? outlet : nextProps.outlets[0]._id;
-    this.setState({ outlet: newOutlet });
-  }
-
   updateData = (itemList, item) => this.setState({ itemList, item });
 
   createStockTransferEntry = async () => {
@@ -65,7 +60,7 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
         itemName: name,
         fromOutletId: outletId,
         toOutletId: outlet,
-        quantity: parseInt(quantity, 10),
+        quantity: parseFloat(quantity, 10),
         unit,
         entryDate: moment(date).format('DD/MM/YYYY')
       };
@@ -75,6 +70,7 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
           _id: editingData._id
         });
       } else {
+        console.log(stockTransferEntry);
         await request.createStockTransferEntry(stockTransferEntry);
       }
       refetchList();
@@ -86,7 +82,14 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
 
   onValueChange = key => value => this.setState({ [key]: value });
 
-  onChangedNumberInput = key => text => this.setState({ [key]: text.replace(/[^0-9]/g, '') });
+  onChangedNumberInput = key => (text) => {
+    const decimalRegex = /^[0-9]+\.[0-9]+$/;
+    if (text.match(decimalRegex)) {
+      this.setState({ [key]: text });
+    } else {
+      this.setState({ [key]: text.replace(/[^0-9]/g, '') });
+    }
+  };
 
   renderItems = itemList => itemList.map(item => (
     <Picker.Item
@@ -114,6 +117,7 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
     <Picker
       selectedValue={item}
       onValueChange={this.onValueChange('item')}
+      style={styles.pickerStyle}
     >
       {this.renderItems(itemList)}
     </Picker>
@@ -123,6 +127,7 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
     <Picker
       selectedValue={unit}
       onValueChange={this.onValueChange('unit')}
+      style={styles.pickerStyle}
     >
       {this.renderUnits()}
     </Picker>
@@ -140,38 +145,44 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
     <Picker
       selectedValue={outlet}
       onValueChange={this.onValueChange('outlet')}
+      style={styles.pickerStyle}
     >
       {this.renderOutlet(outlets)}
     </Picker>
   )
 
+  renderQuantity = quantity => (
+    <FloatingLabel
+      style={styles.input}
+      value={quantity.toString()}
+      onChangeText={this.onChangedNumberInput('quantity')}
+    >
+      Quantity
+    </FloatingLabel>
+  )
+
+  renderSubmitButton = () => <SubmitButton  onPress={this.createStockTransferEntry} />
+
   render() {
-    const { updateModalVisibility, outlets, outletId } = this.props;
+    const { updateModalVisibility, outlets, outletId, isEditing } = this.props;
     const { quantity, item, unit, itemList, outlet } = this.state;
     const filteredOutlets = outlets.filter(o => o._id !== outletId);
+    const text = isEditing ? 'Update Stock Transfer Entry' : 'Add Stock Transfer Entry';
     return (
       <Modal
         isVisible={true}
-        onBackdropPress={updateModalVisibility(false)}
         onBackButtonPress={updateModalVisibility(false)}
+        style={styles.modalWrapper}
       >
-        <View style={styles.modalWrapper}>
+        <View style={{ flex: 2 }}>
+          <PopupHeader text={text} updateModalVisibility={updateModalVisibility} />
+        </View>
+        <View style={{ flex: 9, alignItems: 'center' }}>
           {this.renderStockMaterials(itemList, item)}
           {this.renderUnit(unit)}
           {this.renderOutlets(filteredOutlets, outlet)}
-          <FloatingLabel
-            style={styles.input}
-            value={quantity.toString()}
-            onChangeText={this.onChangedNumberInput('quantity')}
-          >
-            Price
-          </FloatingLabel>
-          <TouchableOpacity
-            onPress={this.createStockTransferEntry}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+          {this.renderQuantity(quantity)}
+          {this.renderSubmitButton()}
         </View>
       </Modal>
     );
@@ -179,39 +190,5 @@ export default class AddUpdateStockTransferModal extends Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  modalWrapper: {
-    marginTop: 50,
-    marginBottom: 50,
-    padding: 20,
-    flex: 1,
-    zIndex: 100,
-    backgroundColor: '#FFF',
-    alignContent: 'center',
-    justifyContent: 'center',
-    borderRadius: 3,
-  },
-  inputWrapper: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    marginBottom: 20
-  },
-  button: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 25,
-    paddingRight: 25,
-    borderRadius: 3,
-    backgroundColor: '#2196F3',
-    marginBottom: 40,
-  },
-  buttonWrapper: {
-    alignItems: 'center'
-  },
-  buttonText: {
-    color: '#FFF'
-  }
+  ...commonStyles
 });

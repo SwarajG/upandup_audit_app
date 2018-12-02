@@ -12,9 +12,9 @@ import AddUpdateStaffFoodEntryModal from '../Popups/AddUpdateStaffFoodEntryModal
 import request from '../helper/request';
 
 const currentDate = new Date();
-const keys = ['firstName', 'lastName', 'itemName', 'mealType', 'foodTime'];
-const tableHead = ['First Name', 'Last Name', 'Meal Type', 'Time', '', ''];
-const widthArr = [100, 100, 150, 80, 80, 80];
+const keys = ['firstName', 'lastName', 'mealType', 'itemName', 'foodTime'];
+const tableHead = ['First Name', 'Last Name', 'Meal Type', 'Item Name', 'Time', '', ''];
+const widthArr = [100, 100, 150, 80, 80, 50, 50];
 
 type Props = {};
 export default class StaffFoodEntry extends Component<Props> {

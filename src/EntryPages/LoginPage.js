@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   Text,
   TextInput,
-  AsyncStorage
+  AsyncStorage,
+  Image
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Navigator from './Navigator';
@@ -60,33 +61,45 @@ export default class LoginPage extends Component<Props> {
       <View style={styles.container}>
         {/* <Modal
           isVisible={true}
+          style={{ zIndex: 100, backgroundColor: '#FFF' }}
         >
-          <View style={styles.test1}>
-            <Text style={{ color: '#000' }}>
-              Hello World
-            </Text>
+          <View style={{ flex: 1, justifyContent: 'center' }}>
+            <View style={{ flex: 2 }}>
+              <Text>Hello World</Text>
+            </View>
+            <View style={{ flex: 8 }}>
+              <Text>Bye world</Text>
+            </View>
           </View>
         </Modal> */}
-        <TextInput
-          autoCapitalize={'none'}
-          style={styles.input}
-          onChangeText={this.updateUserName}
-          value={username}
-          placeholder="User Name"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={this.updatePassword}
-          value={password}
-          secureTextEntry={true}
-          placeholder="Password"
-        />
-        <TouchableOpacity
-          onPress={this.onPressLogin}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+        <View style={{ flex: 4, justifyContent: 'flex-end', alignItems: 'center' }}>
+          <Image
+            style={{ width: 100, height: 100, marginBottom: 50 }}
+            source={{ uri: "https://s3-ap-southeast-1.amazonaws.com/upandup-resources/yupp_food_logo_opt.png" }}
+          />
+        </View>
+        <View style={{ flex: 6, justifyContent: 'flex-start', alignItems: 'center' }}>
+          <TextInput
+            autoCapitalize={'none'}
+            style={styles.input}
+            onChangeText={this.updateUserName}
+            value={username}
+            placeholder="User Name"
+          />
+          <TextInput
+            style={styles.input}
+            onChangeText={this.updatePassword}
+            value={password}
+            secureTextEntry={true}
+            placeholder="Password"
+          />
+          <TouchableOpacity
+            onPress={this.onPressLogin}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -95,14 +108,12 @@ export default class LoginPage extends Component<Props> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    flexDirection: 'column'
   },
   input: {
     borderColor: 'black',
     borderWidth: 1,
-    width: '80%',
+    width: '75%',
     marginBottom: 20,
     paddingLeft: 10
   },

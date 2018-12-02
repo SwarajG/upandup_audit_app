@@ -3,13 +3,15 @@ import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
   Picker
 } from 'react-native';
 import DatePicker from '../helper/component/DatePicker';
+import PopupHeader from '../helper/component/PopupHeader';
+import SubmitButton from '../helper/component/SubmitButton';
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import request from '../helper/request';
+import { commonStyles } from '../helper/styles';
 
 type Props = {
   isVisibleModal: Boolean
@@ -19,9 +21,10 @@ export default class AddUpdateAttendanceEntryModal extends Component<Props> {
     super(props);
     const isEditing = props.editing;
     const { editingData } = props;
+    const currentTime = moment(new Date()).format('HH:mm');
     const userEmail = isEditing ? editingData.userEmail : '';
-    const startTime = isEditing ? editingData.startTime : '00:00';
-    const endTime = isEditing ? editingData.endTime : '00:00';
+    const startTime = isEditing ? editingData.startTime : currentTime;
+    const endTime = isEditing ? editingData.endTime : currentTime;
     this.state = {
       startTime,
       endTime,
@@ -83,12 +86,10 @@ export default class AddUpdateAttendanceEntryModal extends Component<Props> {
 
   onValueChange = key => value => this.setState({ [key]: value });
 
-  onChangedNumberInput = key => text => this.setState({ [key]: text.replace(/[^0-9]/g, '') });
-
   renderUsers = userList => userList.map(user => (
     <Picker.Item
       key={user._id}
-      label={user.email}
+      label={`${user.firstName} ${user.lastName}`}
       value={user.email}
     />
   ))
@@ -97,42 +98,41 @@ export default class AddUpdateAttendanceEntryModal extends Component<Props> {
     <Picker
       selectedValue={userEmail}
       onValueChange={this.onValueChange('userEmail')}
+      style={styles.pickerStyle}
     >
       {this.renderUsers(userList)}
     </Picker>
   )
 
   renderTimePicker = (type, time, title) => (
-    <View style={{ marginTop: 10, flex: 4 }}>
-      <Text style={styles.inputTitle}>{title}</Text>
-      <DatePicker
-        updateDate={this.updateDate(type)}
-        mode="time"
-        time={time}
-      />
-    </View>
+    <DatePicker
+      updateDate={this.updateDate(type)}
+      mode="time"
+      time={time}
+      dateTitle={title}
+    />
   )
 
+  renderSubmitButton = () => <SubmitButton  onPress={this.createAttendanceEntry} />
+
   render() {
-    const { updateModalVisibility } = this.props;
+    const { updateModalVisibility, isEditing } = this.props;
     const { startTime, endTime, userEmail, userList } = this.state;
+    const text = isEditing ? 'Update Attendance Entry' : 'Add Attendance Entry';
     return (
       <Modal
         isVisible={true}
-        onBackdropPress={updateModalVisibility(false)}
         onBackButtonPress={updateModalVisibility(false)}
+        style={styles.modalWrapper}
       >
-        <View style={styles.modalWrapper}>
-          <Text style={{ fontSize: 24, marginBottom: 40, flex: 1 }}>Add Attendance</Text>
+        <View style={{ flex: 2 }}>
+          <PopupHeader text={text} updateModalVisibility={updateModalVisibility} />
+        </View>
+        <View style={{ flex: 9, alignItems: 'center' }}>
           {this.renderUsersList(userList, userEmail)}
           {this.renderTimePicker('startTime', startTime)}
           {this.renderTimePicker('endTime', endTime)}
-          <TouchableOpacity
-            onPress={this.createAttendanceEntry}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+          {this.renderSubmitButton()}
         </View>
       </Modal>
     );
@@ -144,42 +144,5 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 14,
   },
-  modalWrapper: {
-    marginTop: 50,
-    marginBottom: 50,
-    padding: 20,
-    flex: 10,
-    zIndex: 100,
-    backgroundColor: '#FFF',
-    alignContent: 'flex-start',
-    justifyContent: 'center',
-    borderRadius: 3,
-  },
-  inputWrapper: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    marginBottom: 20
-  },
-  button: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 25,
-    paddingRight: 25,
-    borderRadius: 3,
-    backgroundColor: '#2196F3',
-    marginBottom: 40,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  buttonWrapper: {
-    alignItems: 'center'
-  },
-  buttonText: {
-    color: '#FFF'
-  }
+  ...commonStyles
 });

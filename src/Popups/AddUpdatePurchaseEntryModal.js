@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  Text,
-  TouchableOpacity,
   Picker
 } from 'react-native';
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import FloatingLabel from 'react-native-floating-labels';
+import PopupHeader from '../helper/component/PopupHeader';
+import SubmitButton from '../helper/component/SubmitButton';
+import { commonStyles } from '../helper/styles';
 import enums from '../helper/enums';
 import request from '../helper/request';
 
@@ -59,8 +60,8 @@ export default class AddPurchaseEntryModal extends Component<Props> {
         itemId: _id,
         itemName: name,
         unit,
-        quantity: parseInt(quantity, 10),
-        price: parseInt(price, 10),
+        quantity: parseFloat(quantity, 10),
+        price: parseFloat(price, 10),
         entryDate: moment(date).format('DD/MM/YYYY')
       };
       if (isEditing) {
@@ -81,9 +82,14 @@ export default class AddPurchaseEntryModal extends Component<Props> {
 
   onValueChange = key => value => this.setState({ [key]: value });
 
-  onChangedNumberQuantity = text => this.setState({ quantity: text.replace(/[^0-9]/g, '') });
-
-  onChangedNumberPrice = text => this.setState({ price: text.replace(/[^0-9]/g, '') });
+  onChangedNumberInput = key => (text) => {
+    const decimalRegex = /^[0-9]+\.[0-9]+$/;
+    if (text.match(decimalRegex)) {
+      this.setState({ [key]: text });
+    } else {
+      this.setState({ [key]: text.replace(/[^0-9]/g, '') });
+    }
+  };
 
   renderItems = itemList => itemList.map(item => (
     <Picker.Item
@@ -111,6 +117,7 @@ export default class AddPurchaseEntryModal extends Component<Props> {
     <Picker
       selectedValue={item}
       onValueChange={this.onValueChange('item')}
+      style={styles.pickerStyle}
     >
       {this.renderItems(itemList)}
     </Picker>
@@ -120,45 +127,53 @@ export default class AddPurchaseEntryModal extends Component<Props> {
     <Picker
       selectedValue={unit}
       onValueChange={this.onValueChange('unit')}
+      style={styles.pickerStyle}
     >
       {this.renderUnits()}
     </Picker>
   )
 
+  renderQuantity = quantity => (
+    <FloatingLabel
+      style={styles.input}
+      value={quantity.toString()}
+      onChangeText={this.onChangedNumberInput('quantity')}
+    >
+      Quantity
+    </FloatingLabel>
+  )
+
+  rederPrice = price => (
+    <FloatingLabel
+      style={styles.input}
+      value={price.toString()}
+      onChangeText={this.onChangedNumberInput('price')}
+    >
+      Price
+    </FloatingLabel>
+  )
+
+  renderSubmitButton = () => <SubmitButton  onPress={this.createPurchaseEntry} />
+
   render() {
-    const { updateModalVisibility } = this.props;
+    const { updateModalVisibility, isEditing } = this.props;
     const { quantity, price, item, unit, itemList } = this.state;
+    const text = isEditing ? 'Update Purchase Entry' : 'Add Purchase Entry';
     return (
       <Modal
         isVisible={true}
-        onBackdropPress={updateModalVisibility(false)}
         onBackButtonPress={updateModalVisibility(false)}
+        style={styles.modalWrapper}
       >
-        <View style={styles.modalWrapper}>
+        <View style={{ flex: 2 }}>
+          <PopupHeader text={text} updateModalVisibility={updateModalVisibility} />
+        </View>
+        <View style={{ flex: 9, alignItems: 'center' }}>
           {this.renderRowMaterials(itemList, item)}
           {this.renderUnit(unit)}
-          <FloatingLabel
-            style={styles.input}
-            value={quantity.toString()}
-            onChangeText={this.onChangedNumberQuantity}
-          >
-            Quantity
-          </FloatingLabel>
-          <FloatingLabel
-            style={styles.input}
-            value={price.toString()}
-            onChangeText={this.onChangedNumberPrice}
-          >
-            Price
-          </FloatingLabel>
-          <View style={styles.buttonWrapper}>
-            <TouchableOpacity
-              onPress={this.createPurchaseEntry}
-              style={styles.button}
-            >
-              <Text style={styles.buttonText}>Submit</Text>
-            </TouchableOpacity>
-          </View>
+          {this.renderQuantity(quantity)}
+          {this.rederPrice(price)}
+          {this.renderSubmitButton()}
         </View>
       </Modal>
     );
@@ -166,39 +181,5 @@ export default class AddPurchaseEntryModal extends Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  modalWrapper: {
-    marginTop: 50,
-    marginBottom: 50,
-    padding: 20,
-    flex: 1,
-    zIndex: 100,
-    backgroundColor: '#FFF',
-    alignContent: 'center',
-    justifyContent: 'center',
-    borderRadius: 3,
-  },
-  inputWrapper: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    marginBottom: 20
-  },
-  button: {
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingLeft: 25,
-    paddingRight: 25,
-    borderRadius: 3,
-    backgroundColor: '#2196F3',
-    marginBottom: 40,
-  },
-  buttonWrapper: {
-    alignItems: 'center'
-  },
-  buttonText: {
-    color: '#FFF'
-  }
+  ...commonStyles
 });

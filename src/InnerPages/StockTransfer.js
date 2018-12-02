@@ -84,8 +84,7 @@ export default class StockTransfer extends Component<Props> {
   deleteRow = async (rowIndex) => {
     const { stockTransfers } = this.state;
     const entryId = stockTransfers[rowIndex]._id;
-    const responseObject = await request.deleteStockTransferEntry(entryId);
-    const response = await responseObject.json();
+    await request.deleteStockTransferEntry(entryId);
     this.refetchList();
   }
 
